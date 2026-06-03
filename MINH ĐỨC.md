@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+
+<html lang="vi">
+
+<head>
+
+<meta charset="UTF-8">
+
+<title>Chiến Đấu Đi!</title>
+
+<style>
+
+body{
+
+&#x20;   font-family:Arial;
+
+&#x20;   background:#111;
+
+&#x20;   color:white;
+
+&#x20;   text-align:center;
+
+}
+
+button{
+
+&#x20;   padding:10px;
+
+&#x20;   margin:5px;
+
+&#x20;   font-size:16px;
+
+}
+
+.box{
+
+&#x20;   border:1px solid white;
+
+&#x20;   width:500px;
+
+&#x20;   margin:auto;
+
+&#x20;   padding:15px;
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+
+
+<h1>⚔️ CHIẾN ĐẤU ĐI! ⚔️</h1>
+
+<h2>Nhân vật: Admin Dương Minh Đức</h2>
+
+
+
+<div class="box">
+
+&#x20;   <p>Level: <span id="level">1</span>/200</p>
+
+&#x20;   <p>EXP: <span id="exp">0</span></p>
+
+&#x20;   <p>Kill: <span id="kill">0</span></p>
+
+&#x20;   <p>Vàng: <span id="gold">0</span></p>
+
+&#x20;   <p>Sức mạnh: <span id="power">100</span></p>
+
+&#x20;   <p>Máu: <span id="hp">1000</span></p>
+
+&#x20;   <p>Võ công: <span id="skill">Chưa có</span></p>
+
+</div>
+
+
+
+<br>
+
+
+
+<button onclick="fight()">⚔️ Đánh quái</button>
+
+<button onclick="teleport()">🌀 Dịch chuyển (50.000 vàng)</button>
+
+
+
+<h3 id="msg"></h3>
+
+
+
+<script>
+
+let level = 1;
+
+let exp = 0;
+
+let kill = 0;
+
+let gold = 0;
+
+let power = 100;
+
+let hp = 1000;
+
+let skill = "Chưa có";
+
+
+
+function update(){
+
+&#x20;   document.getElementById("level").innerText = level;
+
+&#x20;   document.getElementById("exp").innerText = exp;
+
+&#x20;   document.getElementById("kill").innerText = kill;
+
+&#x20;   document.getElementById("gold").innerText = gold;
+
+&#x20;   document.getElementById("power").innerText = power;
+
+&#x20;   document.getElementById("hp").innerText = hp;
+
+&#x20;   document.getElementById("skill").innerText = skill;
+
+}
+
+
+
+function fight(){
+
+&#x20;   kill++;
+
+&#x20;   exp += 100;
+
+&#x20;   gold += 20000;
+
+
+
+&#x20;   while(level < 200 \&\& exp >= level \* 100){
+
+&#x20;       exp -= level \* 100;
+
+&#x20;       level++;
+
+
+
+&#x20;       power += 50;
+
+&#x20;       hp += 100;
+
+&#x20;   }
+
+
+
+&#x20;   if(level >= 200){
+
+&#x20;       level = 200;
+
+&#x20;   }
+
+
+
+&#x20;   document.getElementById("msg").innerText =
+
+&#x20;       "Bạn đã hạ được đối thủ!";
+
+
+
+&#x20;   update();
+
+}
+
+
+
+function teleport(){
+
+
+
+&#x20;   if(gold < 50000){
+
+&#x20;       alert("Cần 50.000 vàng!");
+
+&#x20;       return;
+
+&#x20;   }
+
+
+
+&#x20;   gold -= 50000;
+
+
+
+&#x20;   let r = Math.random() \* 100;
+
+
+
+&#x20;   if(r < 20){
+
+&#x20;       skill = "⚡ Võ Điện";
+
+&#x20;   }
+
+&#x20;   else if(r < 50){
+
+&#x20;       skill = "🔥 Võ Lửa";
+
+&#x20;   }
+
+&#x20;   else{
+
+&#x20;       skill = "🐟 Võ Cá";
+
+&#x20;   }
+
+
+
+&#x20;   document.getElementById("msg").innerText =
+
+&#x20;       "Bạn nhận được: " + skill;
+
+
+
+&#x20;   update();
+
+}
+
+
+
+update();
+
+</script>
+
+
+
+</body>
+
+</html>
+
