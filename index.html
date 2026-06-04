@@ -303,5 +303,3523 @@ monster.style.top=
 updateUI();
 
 }
+// ===== PHẦN 3 : HỆ THỐNG QUÁI VẬT =====
+
+// Danh sách quái
+let enemies = [];
+
+// Tạo quái
+class Enemy{
+    constructor(x,y,level){
+        this.x = x;
+        this.y = y;
+
+        this.level = level;
+
+        this.maxHp = level * 20;
+        this.hp = this.maxHp;
+
+        this.attack = level * 5;
+        this.exp = level * 10;
+
+        this.size = 40;
+
+        this.color = "red";
+
+        this.alive = true;
+    }
+
+    draw(){
+
+        if(!this.alive) return;
+
+        ctx.fillStyle = this.color;
+
+        ctx.fillRect(
+            this.x,
+            this.y,
+            this.size,
+            this.size
+        );
+
+        ctx.fillStyle = "white";
+
+        ctx.fillText(
+            "Lv."+this.level,
+            this.x,
+            this.y - 5
+        );
+    }
+
+    update(){
+
+        if(!this.alive) return;
+
+        let dx = player.x - this.x;
+        let dy = player.y - this.y;
+
+        let dist = Math.sqrt(
+            dx*dx + dy*dy
+        );
+
+        if(dist < 200){
+
+            this.x += dx / dist;
+            this.y += dy / dist;
+
+        }
+    }
+
+    hit(damage){
+
+        this.hp -= damage;
+
+        if(this.hp <= 0){
+
+            this.hp = 0;
+
+            this.alive = false;
+
+            gainExp(this.exp);
+
+        }
+    }
+}
+
+// Sinh quái
+function spawnEnemy(){
+
+    let x = Math.random() * 1800 + 100;
+
+    let y = Math.random() * 1800 + 100;
+
+    let lv =
+        Math.floor(
+            Math.random()*5
+        ) + player.level;
+
+    enemies.push(
+        new Enemy(x,y,lv)
+    );
+}
+
+// Sinh 20 quái đầu
+for(let i=0;i<20;i++){
+
+    spawnEnemy();
 
 }
+
+// Vẽ quái
+function drawEnemies(){
+
+    for(let enemy of enemies){
+
+        enemy.draw();
+
+    }
+
+}
+
+// Cập nhật quái
+function updateEnemies(){
+
+    for(let enemy of enemies){
+
+        enemy.update();
+
+    }
+
+}
+
+// Kiểm tra va chạm
+function checkEnemyCollision(){
+
+    for(let enemy of enemies){
+
+        if(!enemy.alive) continue;
+
+        let dx =
+            player.x - enemy.x;
+
+        let dy =
+            player.y - enemy.y;
+
+        let dist =
+            Math.sqrt(
+                dx*dx + dy*dy
+            );
+
+        if(dist < 45){
+
+            battle(enemy);
+
+        }
+
+    }
+
+}
+
+// Hàm chiến đấu
+function battle(enemy){
+
+    let damage =
+        player.attack;
+
+    enemy.hit(damage);
+
+}
+
+// Tấn công bằng phím Space
+window.addEventListener(
+    "keydown",
+    function(e){
+
+        if(e.code === "Space"){
+
+            for(let enemy of enemies){
+
+                if(!enemy.alive)
+                    continue;
+
+                let dx =
+                    player.x - enemy.x;
+
+                let dy =
+                    player.y - enemy.y;
+
+                let dist =
+                    Math.sqrt(
+                        dx*dx + dy*dy
+                    );
+
+                if(dist < 80){
+
+                    enemy.hit(
+                        player.attack
+                    );
+
+                }
+
+            }
+
+        }
+
+    }
+);
+
+// Hồi sinh quái
+function respawnEnemies(){
+
+    let aliveCount = 0;
+
+    for(let e of enemies){
+
+        if(e.alive){
+
+            aliveCount++;
+
+        }
+
+    }
+
+    if(aliveCount < 10){
+
+        for(let i=0;i<10;i++){
+
+            spawnEnemy();
+
+        }
+
+    }
+
+}
+
+// Gọi trong gameLoop
+updateEnemies();
+
+drawEnemies();
+
+checkEnemyCollision();
+
+respawnEnemies();
+}// ========================
+// PHẦN 4 BATTLE SYSTEM
+// ========================
+
+player.maxHp = 100;
+player.hp = 100;
+
+player.maxMp = 50;
+player.mp = 50;
+
+player.attack = 10;
+player.defense = 5;
+
+player.critRate = 0.1;
+player.dodgeRate = 0.05;
+
+player.level = 1;
+player.exp = 0;
+
+player.nextLevel = 100;
+
+player.gold = 0;
+
+player.skillPower = 30;
+
+player.maxLevel = 200;
+
+// ========================
+// THANH MÁU
+// ========================
+
+function drawHP(){
+
+    ctx.fillStyle = "red";
+
+    ctx.fillRect(
+        20,
+        20,
+        200,
+        20
+    );
+
+    ctx.fillStyle = "lime";
+
+    ctx.fillRect(
+        20,
+        20,
+        (player.hp/player.maxHp)*200,
+        20
+    );
+
+    ctx.fillStyle = "white";
+
+    ctx.fillText(
+        "HP : "
+        + player.hp
+        + "/"
+        + player.maxHp,
+        25,
+        35
+    );
+
+}
+
+// ========================
+// THANH MP
+// ========================
+
+function drawMP(){
+
+    ctx.fillStyle = "navy";
+
+    ctx.fillRect(
+        20,
+        50,
+        200,
+        20
+    );
+
+    ctx.fillStyle = "cyan";
+
+    ctx.fillRect(
+        20,
+        50,
+        (player.mp/player.maxMp)*200,
+        20
+    );
+
+    ctx.fillStyle = "white";
+
+    ctx.fillText(
+        "MP : "
+        + player.mp
+        + "/"
+        + player.maxMp,
+        25,
+        65
+    );
+
+}
+
+// ========================
+// NHẬN EXP
+// ========================
+
+function gainExp(exp){
+
+    player.exp += exp;
+
+    if(
+        player.exp >=
+        player.nextLevel
+    ){
+
+        levelUp();
+
+    }
+
+}
+
+// ========================
+// LÊN CẤP
+// ========================
+
+function levelUp(){
+
+    if(
+        player.level >=
+        player.maxLevel
+    ){
+        return;
+    }
+
+    player.level++;
+
+    player.exp = 0;
+
+    player.nextLevel =
+        Math.floor(
+            player.nextLevel * 1.2
+        );
+
+    player.maxHp += 20;
+
+    player.maxMp += 10;
+
+    player.attack += 5;
+
+    player.defense += 2;
+
+    player.hp =
+        player.maxHp;
+
+    player.mp =
+        player.maxMp;
+
+}
+
+// ========================
+// ĐÒN ĐÁNH THƯỜNG
+// ========================
+
+function attackEnemy(enemy){
+
+    let damage =
+        player.attack;
+
+    if(
+        Math.random()
+        <
+        player.critRate
+    ){
+
+        damage *= 2;
+
+    }
+
+    enemy.hit(damage);
+
+}
+
+// ========================
+// KỸ NĂNG FIRE BALL
+// ========================
+
+function castSkill(enemy){
+
+    if(
+        player.mp < 10
+    ){
+        return;
+    }
+
+    player.mp -= 10;
+
+    let damage =
+        player.attack
+        +
+        player.skillPower;
+
+    enemy.hit(damage);
+
+}
+
+// ========================
+// HỒI MÁU
+// ========================
+
+function healPlayer(){
+
+    if(
+        player.mp < 15
+    ){
+        return;
+    }
+
+    player.mp -= 15;
+
+    player.hp += 50;
+
+    if(
+        player.hp >
+        player.maxHp
+    ){
+
+        player.hp =
+        player.maxHp;
+
+    }
+
+}
+
+// ========================
+// QUÁI TẤN CÔNG
+// ========================
+
+function enemyAttack(enemy){
+
+    if(
+        Math.random()
+        <
+        player.dodgeRate
+    ){
+
+        return;
+
+    }
+
+    let damage =
+        enemy.attack
+        -
+        player.defense;
+
+    if(
+        damage < 1
+    ){
+
+        damage = 1;
+
+    }
+
+    player.hp -= damage;
+
+    if(
+        player.hp <= 0
+    ){
+
+        player.hp = 0;
+
+        gameOver();
+
+    }
+
+}
+
+// ========================
+// GAME OVER
+// ========================
+
+function gameOver(){
+
+    alert(
+        "GAME OVER"
+    );
+
+    location.reload();
+
+}
+
+// ========================
+// PHÍM KỸ NĂNG
+// ========================
+
+window.addEventListener(
+"keydown",
+function(e){
+
+if(
+e.code==="KeyF"
+){
+
+for(
+let enemy
+of enemies
+){
+
+if(
+!enemy.alive
+)
+continue;
+
+let dx=
+player.x-enemy.x;
+
+let dy=
+player.y-enemy.y;
+
+let dist=
+Math.sqrt(
+dx*dx+
+dy*dy
+);
+
+if(
+dist<120
+){
+
+castSkill(
+enemy
+);
+
+}
+
+}
+
+}
+
+}
+);
+
+// ========================
+// PHÍM HỒI MÁU
+// ========================
+
+window.addEventListener(
+"keydown",
+function(e){
+
+if(
+e.code==="KeyH"
+){
+
+healPlayer();
+
+}
+
+}
+);
+
+// ========================
+// GỌI TRONG GAME LOOP
+// ========================
+
+drawHP();
+
+drawMP();
+// =======================
+// PHẦN 5 NPC + SHOP
+// =======================
+
+// Vàng
+player.gold = 100;
+
+// Trang bị
+player.weapon = "Tay Không";
+player.armor = "Áo Vải";
+
+// Nhiệm vụ
+let quest = {
+
+    active:false,
+
+    completed:false,
+
+    target:10,
+
+    progress:0,
+
+    rewardGold:500,
+
+    rewardExp:300
+
+};
+
+// =======================
+// NPC
+// =======================
+
+class NPC{
+
+    constructor(x,y,name){
+
+        this.x=x;
+        this.y=y;
+
+        this.name=name;
+
+        this.size=50;
+
+    }
+
+    draw(){
+
+        ctx.fillStyle="yellow";
+
+        ctx.fillRect(
+            this.x,
+            this.y,
+            this.size,
+            this.size
+        );
+
+        ctx.fillStyle="white";
+
+        ctx.fillText(
+            this.name,
+            this.x-10,
+            this.y-10
+        );
+
+    }
+
+}
+
+let shopNPC =
+new NPC(
+    600,
+    400,
+    "Shop"
+);
+
+let questNPC =
+new NPC(
+    800,
+    400,
+    "Quest"
+);
+
+// =======================
+// VẼ NPC
+// =======================
+
+function drawNPCs(){
+
+    shopNPC.draw();
+
+    questNPC.draw();
+
+}
+
+// =======================
+// KHOẢNG CÁCH
+// =======================
+
+function distance(a,b){
+
+    let dx=a.x-b.x;
+
+    let dy=a.y-b.y;
+
+    return Math.sqrt(
+        dx*dx+
+        dy*dy
+    );
+
+}
+
+// =======================
+// SHOP
+// =======================
+
+function openShop(){
+
+    let choice =
+    prompt(
+
+"1.Kiếm Sắt (100 vàng)\n"+
+"2.Giáp Sắt (150 vàng)\n"+
+"3.Thuốc Máu (50 vàng)"
+
+    );
+
+    if(choice=="1"){
+
+        if(player.gold>=100){
+
+            player.gold-=100;
+
+            player.weapon=
+            "Kiếm Sắt";
+
+            player.attack+=20;
+
+            alert(
+            "Mua Kiếm Sắt!"
+            );
+
+        }
+
+    }
+
+    if(choice=="2"){
+
+        if(player.gold>=150){
+
+            player.gold-=150;
+
+            player.armor=
+            "Giáp Sắt";
+
+            player.defense+=10;
+
+            alert(
+            "Mua Giáp Sắt!"
+            );
+
+        }
+
+    }
+
+    if(choice=="3"){
+
+        if(player.gold>=50){
+
+            player.gold-=50;
+
+            player.hp+=100;
+
+            if(
+            player.hp>
+            player.maxHp
+            ){
+
+                player.hp=
+                player.maxHp;
+
+            }
+
+        }
+
+    }
+
+}
+
+// =======================
+// NHẬN QUEST
+// =======================
+
+function openQuest(){
+
+    if(
+    !quest.active &&
+    !quest.completed
+    ){
+
+        quest.active=true;
+
+        alert(
+        "Tiêu diệt 10 quái!"
+        );
+
+        return;
+
+    }
+
+    if(
+    quest.active &&
+    quest.progress>=
+    quest.target
+    ){
+
+        quest.active=false;
+
+        quest.completed=true;
+
+        player.gold+=
+        quest.rewardGold;
+
+        gainExp(
+        quest.rewardExp
+        );
+
+        alert(
+        "Hoàn thành nhiệm vụ!"
+        );
+
+    }
+
+}
+
+// =======================
+// ĐẾM QUÁI BỊ HẠ
+// =======================
+
+function enemyKilled(){
+
+    if(
+    quest.active
+    ){
+
+        quest.progress++;
+
+    }
+
+}
+
+// =======================
+// GỌI KHI QUÁI CHẾT
+// =======================
+
+// enemyKilled();
+
+// =======================
+// TƯƠNG TÁC NPC
+// =======================
+
+window.addEventListener(
+"keydown",
+function(e){
+
+if(
+e.code==="KeyE"
+){
+
+if(
+distance(
+player,
+shopNPC
+)<100
+){
+
+openShop();
+
+}
+
+if(
+distance(
+player,
+questNPC
+)<100
+){
+
+openQuest();
+
+}
+
+}
+
+}
+);
+
+// =======================
+// HIỂN THỊ THÔNG TIN
+// =======================
+
+function drawInfo(){
+
+ctx.fillStyle=
+"white";
+
+ctx.fillText(
+"Gold: "+
+player.gold,
+20,
+100
+);
+
+ctx.fillText(
+"Weapon: "+
+player.weapon,
+20,
+120
+);
+
+ctx.fillText(
+"Armor: "+
+player.armor,
+20,
+140
+);
+
+ctx.fillText(
+"Quest: "+
+quest.progress+
+"/"+
+quest.target,
+20,
+160
+);
+
+}
+
+// =======================
+// GAME LOOP
+// =======================
+
+// drawNPCs();
+//// ======================
+// PHẦN 6 INVENTORY
+// ======================
+
+let inventory = [];
+
+// ======================
+// THÊM ĐỒ
+// ======================
+
+function addItem(item){
+
+    inventory.push(item);
+
+    alert(
+        "Nhận được: " +
+        item.name
+    );
+
+}
+
+// ======================
+// HIỂN THỊ TÚI ĐỒ
+// ======================
+
+function showInventory(){
+
+    let text = "=== TÚI ĐỒ ===\n";
+
+    for(let i=0;i<inventory.length;i++){
+
+        text +=
+        (i+1)
+        + ". "
+        + inventory[i].name
+        + "\n";
+
+    }
+
+    alert(text);
+
+}
+
+// Nhấn I mở túi đồ
+window.addEventListener(
+"keydown",
+function(e){
+
+if(e.code==="KeyI"){
+
+showInventory();
+
+}
+
+}
+);
+
+// ======================
+// ITEM
+// ======================
+
+const items = [
+
+{
+name:"Kiếm Gỗ",
+rarity:"Thường",
+atk:5
+},
+
+{
+name:"Kiếm Sắt",
+rarity:"Hiếm",
+atk:20
+},
+
+{
+name:"Kiếm Rồng",
+rarity:"Sử Thi",
+atk:100
+},
+
+{
+name:"Áo Giáp Rồng",
+rarity:"Sử Thi",
+def:80
+}
+
+];
+
+// ======================
+// RƠI ĐỒ
+// ======================
+
+function dropItem(enemy){
+
+    let chance =
+    Math.random();
+
+    if(chance < 0.3){
+
+        let item =
+        items[
+        Math.floor(
+        Math.random()
+        *
+        items.length
+        )
+        ];
+
+        addItem(item);
+
+    }
+
+}
+
+// ======================
+// GỌI KHI QUÁI CHẾT
+// ======================
+
+// dropItem(enemy);
+
+// ======================
+// BOSS
+// ======================
+
+class Boss{
+
+constructor(){
+
+this.x=1200;
+
+this.y=1200;
+
+this.size=80;
+
+this.maxHp=5000;
+
+this.hp=5000;
+
+this.attack=100;
+
+this.alive=true;
+
+}
+
+draw(){
+
+if(!this.alive)
+return;
+
+ctx.fillStyle=
+"purple";
+
+ctx.fillRect(
+this.x,
+this.y,
+this.size,
+this.size
+);
+
+ctx.fillStyle=
+"white";
+
+ctx.fillText(
+"BOSS",
+this.x,
+this.y-10
+);
+
+}
+
+hit(dmg){
+
+this.hp-=dmg;
+
+if(this.hp<=0){
+
+this.hp=0;
+
+this.alive=false;
+
+player.gold+=5000;
+
+gainExp(5000);
+
+addItem({
+name:"Kiếm Hủy Diệt",
+rarity:"Huyền Thoại",
+atk:500
+});
+
+alert(
+"ĐÃ HẠ BOSS!"
+);
+
+}
+
+}
+
+}
+
+let boss =
+new Boss();
+
+// ======================
+// VẼ BOSS
+// ======================
+
+function drawBoss(){
+
+boss.draw();
+
+}
+
+// ======================
+// SAVE GAME
+// ======================
+
+function saveGame(){
+
+let data={
+
+level:player.level,
+
+exp:player.exp,
+
+gold:player.gold,
+
+hp:player.hp,
+
+mp:player.mp,
+
+inventory:inventory
+
+};
+
+localStorage.setItem(
+"chiendaudi_save",
+JSON.stringify(data)
+);
+
+alert("Đã lưu game");
+
+}
+
+// ======================
+// LOAD GAME
+// ======================
+
+function loadGame(){
+
+let data =
+localStorage.getItem(
+"chiendaudi_save"
+);
+
+if(!data) return;
+
+data=
+JSON.parse(data);
+
+player.level=
+data.level;
+
+player.exp=
+data.exp;
+
+player.gold=
+data.gold;
+
+player.hp=
+data.hp;
+
+player.mp=
+data.mp;
+
+inventory=
+data.inventory;
+
+alert(
+"Đã tải game"
+);
+
+}
+
+// ======================
+// PHÍM SAVE / LOAD
+// ======================
+
+window.addEventListener(
+"keydown",
+function(e){
+
+if(e.code==="F5"){
+
+saveGame();
+
+}
+
+if(e.code==="F9"){
+
+loadGame();
+
+}
+
+}
+); drawInfo();
+// =======================
+// PHẦN 7 CLASS SYSTEM
+// =======================
+
+let selectedClass = "";
+
+// =======================
+// CHỌN NHÂN VẬT
+// =======================
+
+function chooseClass(){
+
+let choice = prompt(
+
+"CHỌN NHÂN VẬT\n\n"+
+"1. Kiếm Sĩ\n"+
+"2. Cung Thủ\n"+
+"3. Pháp Sư\n"+
+"4. Hiệp Sĩ\n"+
+"5. Sát Thủ\n"+
+"6. Linh Mục"
+
+);
+
+if(choice=="1"){
+
+selectedClass="Kiếm Sĩ";
+
+player.maxHp=150;
+player.attack=25;
+player.defense=10;
+
+}
+
+if(choice=="2"){
+
+selectedClass="Cung Thủ";
+
+player.maxHp=110;
+player.attack=30;
+player.defense=5;
+
+}
+
+if(choice=="3"){
+
+selectedClass="Pháp Sư";
+
+player.maxHp=90;
+player.maxMp=200;
+player.attack=40;
+
+}
+
+if(choice=="4"){
+
+selectedClass="Hiệp Sĩ";
+
+player.maxHp=250;
+player.attack=18;
+player.defense=25;
+
+}
+
+if(choice=="5"){
+
+selectedClass="Sát Thủ";
+
+player.maxHp=100;
+player.attack=45;
+player.critRate=0.35;
+
+}
+
+if(choice=="6"){
+
+selectedClass="Linh Mục";
+
+player.maxHp=120;
+player.maxMp=180;
+player.attack=15;
+
+}
+
+player.hp=player.maxHp;
+
+alert(
+"Bạn đã chọn: "
++
+selectedClass
+);
+
+}
+
+// =======================
+// KỸ NĂNG RIÊNG
+// =======================
+
+function useClassSkill(enemy){
+
+if(selectedClass=="Kiếm Sĩ"){
+
+enemy.hit(
+player.attack*3
+);
+
+}
+
+if(selectedClass=="Cung Thủ"){
+
+enemy.hit(
+player.attack*2
+);
+
+}
+
+if(selectedClass=="Pháp Sư"){
+
+enemy.hit(
+player.attack*5
+);
+
+}
+
+if(selectedClass=="Hiệp Sĩ"){
+
+player.defense += 5;
+
+}
+
+if(selectedClass=="Sát Thủ"){
+
+enemy.hit(
+player.attack*4
+);
+
+}
+
+if(selectedClass=="Linh Mục"){
+
+player.hp += 100;
+
+if(player.hp>
+player.maxHp){
+
+player.hp=
+player.maxHp;
+
+}
+
+}
+
+}
+
+// =======================
+// PHÍM Q DÙNG SKILL
+// =======================
+
+window.addEventListener(
+"keydown",
+function(e){
+
+if(e.code==="KeyQ"){
+
+for(let enemy of enemies){
+
+if(!enemy.alive)
+continue;
+
+let dx=
+player.x-enemy.x;
+
+let dy=
+player.y-enemy.y;
+
+let dist=
+Math.sqrt(
+dx*dx+
+dy*dy
+);
+
+if(dist<150){
+
+useClassSkill(
+enemy
+);
+
+}
+
+}
+
+}
+
+}
+);
+
+// =======================
+// HÀO QUANG LEVEL CAO
+// =======================
+
+function drawAura(){
+
+if(player.level>=50){
+
+ctx.beginPath();
+
+ctx.arc(
+player.x+20,
+player.y+20,
+35,
+0,
+Math.PI*2
+);
+
+ctx.strokeStyle=
+"gold";
+
+ctx.stroke();
+
+}
+
+if(player.level>=100){
+
+ctx.beginPath();
+
+ctx.arc(
+player.x+20,
+player.y+20,
+45,
+0,
+Math.PI*2
+);
+
+ctx.stroke();
+
+}
+
+if(player.level>=150){
+
+ctx.beginPath();
+
+ctx.arc(
+player.x+20,
+player.y+20,
+55,
+0,
+Math.PI*2
+);
+
+ctx.stroke();
+
+}
+
+if(player.level>=200){
+
+ctx.beginPath();
+
+ctx.arc(
+player.x+20,
+player.y+20,
+70,
+0,
+Math.PI*2
+);
+
+ctx.stroke();
+
+}
+
+}
+
+// =======================
+// GỌI KHI GAME BẮT ĐẦU
+// =======================
+
+chooseClass();
+
+// =======================
+// GAME LOOP
+// =======================
+
+// drawAura();// ==========================
+// PHẦN 8 ANIMATION SYSTEM
+// ==========================
+
+// Sprite hiện tại
+let currentFrame = 0;
+
+let frameTimer = 0;
+
+let frameSpeed = 10;
+
+let direction = "down";
+
+// ==========================
+// SPRITE KIẾM SĨ
+// ==========================
+
+const playerSprite = new Image();
+
+playerSprite.src =
+"player.png";
+
+// ==========================
+// KÍCH THƯỚC SPRITE
+// ==========================
+
+const spriteWidth = 48;
+
+const spriteHeight = 48;
+
+// ==========================
+// DI CHUYỂN
+// ==========================
+
+function updateDirection(){
+
+if(keys["w"])
+direction="up";
+
+if(keys["s"])
+direction="down";
+
+if(keys["a"])
+direction="left";
+
+if(keys["d"])
+direction="right";
+
+}
+
+// ==========================
+// FRAME ANIMATION
+// ==========================
+
+function updateAnimation(){
+
+frameTimer++;
+
+if(frameTimer>=frameSpeed){
+
+frameTimer=0;
+
+currentFrame++;
+
+if(currentFrame>3){
+
+currentFrame=0;
+
+}
+
+}
+
+}
+
+// ==========================
+// VẼ NHÂN VẬT
+// ==========================
+
+function drawPlayerSprite(){
+
+let row=0;
+
+if(direction==="down")
+row=0;
+
+if(direction==="left")
+row=1;
+
+if(direction==="right")
+row=2;
+
+if(direction==="up")
+row=3;
+
+ctx.drawImage(
+
+playerSprite,
+
+currentFrame*spriteWidth,
+row*spriteHeight,
+
+spriteWidth,
+spriteHeight,
+
+player.x,
+player.y,
+
+64,
+64
+
+);
+
+}
+
+// ==========================
+// ANIMATION ĐÁNH KIẾM
+// ==========================
+
+let attacking=false;
+
+let attackTime=0;
+
+window.addEventListener(
+"keydown",
+function(e){
+
+if(e.code==="Space"){
+
+attacking=true;
+
+attackTime=15;
+
+}
+
+}
+);
+
+function updateAttack(){
+
+if(attacking){
+
+attackTime--;
+
+if(attackTime<=0){
+
+attacking=false;
+
+}
+
+}
+
+}
+
+// ==========================
+// HIỆU ỨNG KIẾM
+// ==========================
+
+function drawSwordEffect(){
+
+if(!attacking)
+return;
+
+ctx.beginPath();
+
+ctx.arc(
+
+player.x+32,
+player.y+32,
+
+50,
+
+0,
+
+Math.PI*2
+
+);
+
+ctx.strokeStyle="yellow";
+
+ctx.stroke();
+
+}
+
+// ==========================
+// RỒNG BOSS
+// ==========================
+
+class DragonBoss{
+
+constructor(){
+
+this.x=1800;
+
+this.y=1800;
+
+this.hp=50000;
+
+this.maxHp=50000;
+
+this.attack=500;
+
+this.size=150;
+
+this.alive=true;
+
+}
+
+draw(){
+
+if(!this.alive)
+return;
+
+ctx.fillStyle="darkred";
+
+ctx.fillRect(
+
+this.x,
+
+this.y,
+
+this.size,
+
+this.size
+
+);
+
+ctx.fillStyle="white";
+
+ctx.fillText(
+
+"RỒNG BOSS",
+
+this.x,
+
+this.y-20
+
+);
+
+}
+
+hit(dmg){
+
+this.hp-=dmg;
+
+if(this.hp<=0){
+
+this.hp=0;
+
+this.alive=false;
+
+player.gold+=50000;
+
+gainExp(50000);
+
+alert(
+"ĐÃ HẠ RỒNG!"
+);
+
+}
+
+}
+
+}
+
+let dragon =
+new DragonBoss();
+
+// ==========================
+// CÁNH THIÊN THẦN
+// ==========================
+
+function drawWings(){
+
+if(player.level<200)
+return;
+
+ctx.fillStyle="white";
+
+ctx.fillRect(
+
+player.x-20,
+
+player.y,
+
+15,
+
+50
+
+);
+
+ctx.fillRect(
+
+player.x+55,
+
+player.y,
+
+15,
+
+50
+
+);
+
+}
+
+// ==========================
+// TRANG BỊ PHÁT SÁNG
+// ==========================
+
+function drawLegendEffect(){
+
+if(player.attack<500)
+return;
+
+ctx.beginPath();
+
+ctx.arc(
+
+player.x+32,
+
+player.y+32,
+
+80,
+
+0,
+
+Math.PI*2
+
+);
+
+ctx.strokeStyle="orange";
+
+ctx.stroke();
+
+}
+
+// ==========================
+// GAME LOOP
+// ==========================
+
+// updateDirection();
+// updateAnimation();
+// updateAttack();
+
+// drawPlayerSprite();
+// drawSwordEffect();
+// drawWings();
+// drawLegendEffect();
+
+// dragon.draw// ======================
+// PHẦN 9 VIP SYSTEM
+// ======================
+
+// Mã bí mật
+function enterSecretCode(){
+
+let code =
+prompt("Nhập mã bí mật:");
+
+if(code === "0000"){
+
+player.level = 200;
+
+player.attack += 9999;
+
+player.defense += 9999;
+
+player.maxHp += 99999;
+
+player.hp = player.maxHp;
+
+player.canFly = true;
+
+player.stamina = 99999;
+
+alert(
+"MAX CẤP THÀNH CÔNG!"
+);
+
+spawnDragonPet();
+
+}
+
+}
+
+// ======================
+// PHÍM MỞ MÃ
+// ======================
+
+window.addEventListener(
+"keydown",
+function(e){
+
+if(e.code==="KeyP"){
+
+enterSecretCode();
+
+}
+
+}
+);
+
+// ======================
+// THỂ LỰC
+// ======================
+
+player.stamina = 100;
+
+player.maxStamina = 100;
+
+function drawStamina(){
+
+ctx.fillStyle="gray";
+
+ctx.fillRect(
+20,
+80,
+200,
+20
+);
+
+ctx.fillStyle="yellow";
+
+ctx.fillRect(
+20,
+80,
+(player.stamina/
+player.maxStamina)
+*200,
+20
+);
+
+}
+
+// ======================
+// BAY
+// ======================
+
+player.canFly = false;
+
+function flyMode(){
+
+if(!player.canFly)
+return;
+
+if(keys["Shift"]){
+
+player.y -= 5;
+
+}
+
+}
+
+// ======================
+// PET RỒNG
+// ======================
+
+let dragonPet = null;
+
+class DragonPet{
+
+constructor(){
+
+this.x=0;
+this.y=0;
+
+this.size=40;
+
+}
+
+update(){
+
+this.x =
+player.x - 60;
+
+this.y =
+player.y - 60;
+
+}
+
+draw(){
+
+ctx.fillStyle="orange";
+
+ctx.fillRect(
+this.x,
+this.y,
+this.size,
+this.size
+);
+
+ctx.fillStyle="white";
+
+ctx.fillText(
+"PET RỒNG",
+this.x-10,
+this.y-10
+);
+
+}
+
+attackEnemy(enemy){
+
+enemy.hit(500);
+
+}
+
+}
+
+function spawnDragonPet(){
+
+dragonPet =
+new DragonPet();
+
+}
+
+// ======================
+// PET TỰ ĐÁNH
+// ======================
+
+function petAutoAttack(){
+
+if(!dragonPet)
+return;
+
+for(let enemy of enemies){
+
+if(!enemy.alive)
+continue;
+
+let dx=
+dragonPet.x-enemy.x;
+
+let dy=
+dragonPet.y-enemy.y;
+
+let dist=
+Math.sqrt(
+dx*dx+
+dy*dy
+);
+
+if(dist<150){
+
+dragonPet.attackEnemy(
+enemy
+);
+
+}
+
+}
+
+}
+
+// ======================
+// HIỆU ỨNG MAX CẤP
+// ======================
+
+function drawMaxAura(){
+
+if(player.level<200)
+return;
+
+ctx.beginPath();
+
+ctx.arc(
+player.x+32,
+player.y+32,
+100,
+0,
+Math.PI*2
+);
+
+ctx.strokeStyle=
+"gold";
+
+ctx.lineWidth=5;
+
+ctx.stroke();
+
+}
+
+// ======================
+// GAME LOOP
+// ======================
+
+// flyMode();
+
+// drawStamina();
+
+// drawMaxAura();
+
+// if(dragonPet){
+// dragonPet.update();
+// dragonPet.draw();
+// }
+
+// petAutoAttack();();// ===========================
+// PHẦN 10 END GAME CONTENT
+// ===========================
+
+// Thế giới
+let world = {
+
+name:"Lục Địa Chiến Đấu",
+
+areas:[
+
+"Thành Phố Tân Thủ",
+
+"Rừng Quái",
+
+"Sa Mạc",
+
+"Núi Rồng",
+
+"Vực Thần",
+
+"Thiên Giới"
+
+]
+
+};
+
+// ===========================
+// THÚ CƯỠI RỒNG
+// ===========================
+
+player.mount = false;
+
+function rideDragon(){
+
+if(!dragonPet)
+return;
+
+player.mount = !player.mount;
+
+if(player.mount){
+
+alert(
+"Đã cưỡi Rồng!"
+);
+
+}
+
+}
+
+// Phím R
+window.addEventListener(
+"keydown",
+function(e){
+
+if(e.code==="KeyR"){
+
+rideDragon();
+
+}
+
+}
+);
+
+// ===========================
+// TỐC ĐỘ CƯỠI RỒNG
+// ===========================
+
+function updateMount(){
+
+if(!player.mount)
+return;
+
+if(keys["w"])
+player.y-=10;
+
+if(keys["s"])
+player.y+=10;
+
+if(keys["a"])
+player.x-=10;
+
+if(keys["d"])
+player.x+=10;
+
+}
+
+// ===========================
+// BOSS CUỐI
+// ===========================
+
+class GodBoss{
+
+constructor(){
+
+this.x=3000;
+
+this.y=3000;
+
+this.hp=1000000;
+
+this.maxHp=1000000;
+
+this.attack=5000;
+
+this.alive=true;
+
+}
+
+draw(){
+
+if(!this.alive)
+return;
+
+ctx.fillStyle="black";
+
+ctx.fillRect(
+this.x,
+this.y,
+200,
+200
+);
+
+ctx.fillStyle="red";
+
+ctx.fillText(
+"THẦN HỦY DIỆT",
+this.x,
+this.y-20
+);
+
+}
+
+hit(damage){
+
+this.hp-=damage;
+
+if(this.hp<=0){
+
+this.hp=0;
+
+this.alive=false;
+
+player.gold+=999999;
+
+player.level=200;
+
+alert(
+"CHIẾN THẮNG!"
+);
+
+unlockLegendForm();
+
+}
+
+}
+
+}
+
+let godBoss =
+new GodBoss();
+
+// ===========================
+// DẠNG HUYỀN THOẠI
+// ===========================
+
+player.legendForm=false;
+
+function unlockLegendForm(){
+
+player.legendForm=true;
+
+player.attack+=10000;
+
+player.defense+=10000;
+
+player.maxHp+=500000;
+
+player.hp=
+player.maxHp;
+
+}
+
+// ===========================
+// HIỆU ỨNG HUYỀN THOẠI
+// ===========================
+
+function drawLegendForm(){
+
+if(!player.legendForm)
+return;
+
+ctx.beginPath();
+
+ctx.arc(
+player.x+32,
+player.y+32,
+150,
+0,
+Math.PI*2
+);
+
+ctx.lineWidth=8;
+
+ctx.strokeStyle="cyan";
+
+ctx.stroke();
+
+}
+
+// ===========================
+// PET RỒNG MAX
+// ===========================
+
+function upgradeDragonPet(){
+
+if(!dragonPet)
+return;
+
+dragonPet.size=80;
+
+dragonPet.attackPower=5000;
+
+alert(
+"PET RỒNG MAX!"
+);
+
+}
+
+// ===========================
+// MÃ BÍ MẬT THỨ 2
+// ===========================
+
+function vipCode(){
+
+let code =
+prompt("VIP CODE");
+
+if(code==="DRAGONMAX"){
+
+upgradeDragonPet();
+
+player.canFly=true;
+
+player.level=200;
+
+player.gold+=100000;
+
+}
+
+}
+
+// ===========================
+// PHÍM O
+// ===========================
+
+window.addEventListener(
+"keydown",
+function(e){
+
+if(e.code==="KeyO"){
+
+vipCode();
+
+}
+
+}
+);
+
+// ===========================
+// GAME LOOP
+// ===========================
+
+// updateMount();
+// drawLegendForm();
+// godBoss.draw();
+// ===========================
+// PHẦN 11 ACCOUNT + PVP
+// ===========================
+
+// Tài khoản hiện tại
+let currentUser = null;
+
+// ===========================
+// ĐĂNG KÝ
+// ===========================
+
+function register(){
+
+let username =
+prompt("Tên tài khoản");
+
+let password =
+prompt("Mật khẩu");
+
+if(!username || !password)
+return;
+
+let account = {
+
+username:username,
+
+password:password,
+
+level:1,
+
+power:10,
+
+wins:0,
+
+losses:0
+
+};
+
+localStorage.setItem(
+"account_" + username,
+JSON.stringify(account)
+);
+
+alert(
+"Đăng ký thành công!"
+);
+
+}
+
+// ===========================
+// ĐĂNG NHẬP
+// ===========================
+
+function login(){
+
+let username =
+prompt("Tên tài khoản");
+
+let password =
+prompt("Mật khẩu");
+
+let data =
+localStorage.getItem(
+"account_" + username
+);
+
+if(!data){
+
+alert("Không tồn tại!");
+
+return;
+
+}
+
+data = JSON.parse(data);
+
+if(data.password !== password){
+
+alert("Sai mật khẩu!");
+
+return;
+
+}
+
+currentUser = data;
+
+alert(
+"Xin chào " +
+currentUser.username
+);
+
+}
+
+// ===========================
+// LƯU THÔNG TIN
+// ===========================
+
+function saveAccount(){
+
+if(!currentUser)
+return;
+
+currentUser.level =
+player.level;
+
+currentUser.power =
+player.attack;
+
+localStorage.setItem(
+
+"account_" +
+currentUser.username,
+
+JSON.stringify(
+currentUser
+)
+
+);
+
+}
+
+// ===========================
+// BẢNG XẾP HẠNG
+// ===========================
+
+function showLeaderboard(){
+
+let players = [];
+
+for(let i=0;i<localStorage.length;i++){
+
+let key =
+localStorage.key(i);
+
+if(
+key.startsWith(
+"account_"
+)
+){
+
+let p =
+JSON.parse(
+localStorage.getItem(key)
+);
+
+players.push(p);
+
+}
+
+}
+
+// Sắp xếp theo level
+players.sort(
+
+(a,b)=>
+b.level-a.level
+
+);
+
+let text =
+"=== TOP 10 ===\n\n";
+
+for(
+let i=0;
+i<
+Math.min(
+10,
+players.length
+);
+i++
+){
+
+text +=
+
+(i+1)+". "
++
+players[i].username
++
+" | Lv "
++
+players[i].level
++
+"\n";
+
+}
+
+alert(text);
+
+}
+
+// ===========================
+// PVP
+// ===========================
+
+function startPVP(){
+
+let enemyName =
+prompt(
+"Tên đối thủ"
+);
+
+let enemyData =
+localStorage.getItem(
+"account_" +
+enemyName
+);
+
+if(!enemyData){
+
+alert(
+"Không tìm thấy!"
+);
+
+return;
+
+}
+
+enemyData =
+JSON.parse(
+enemyData
+);
+
+let myPower =
+player.attack;
+
+let enemyPower =
+enemyData.power;
+
+if(myPower >= enemyPower){
+
+alert(
+"Bạn thắng PvP!"
+);
+
+currentUser.wins++;
+
+player.gold += 1000;
+
+}else{
+
+alert(
+"Bạn thua PvP!"
+);
+
+currentUser.losses++;
+
+}
+
+saveAccount();
+
+}
+
+// ===========================
+// PHÍM TẮT
+// ===========================
+
+// L = Login
+// K = Register
+// T = Top Rank
+// V = PvP
+
+window.addEventListener(
+"keydown",
+function(e){
+
+if(e.code==="KeyK")
+register();
+
+if(e.code==="KeyL")
+login();
+
+if(e.code==="KeyT")
+showLeaderboard();
+
+if(e.code==="KeyV")
+startPVP();
+
+}
+);// ===========================
+// PHẦN 12 GUILD SYSTEM
+// ===========================
+
+// Bang hội hiện tại
+let guild = null;
+
+// ===========================
+// TẠO BANG HỘI
+// ===========================
+
+function createGuild(){
+
+let name =
+prompt("Tên Bang Hội");
+
+if(!name) return;
+
+guild = {
+
+name:name,
+
+level:1,
+
+exp:0,
+
+members:[
+currentUser ?
+currentUser.username :
+"Player"
+]
+
+};
+
+alert(
+"Đã tạo bang hội: "
++ name
+);
+
+}
+
+// ===========================
+// CHAT BANG HỘI
+// ===========================
+
+let guildChat = [];
+
+function sendGuildMessage(){
+
+if(!guild) return;
+
+let msg =
+prompt("Tin nhắn");
+
+if(!msg) return;
+
+guildChat.push(
+
+(currentUser ?
+currentUser.username :
+"Player")
+
++ ": " +
+
+msg
+
+);
+
+}
+
+function showGuildChat(){
+
+if(guildChat.length===0){
+
+alert(
+"Chưa có tin nhắn"
+);
+
+return;
+
+}
+
+alert(
+guildChat.join("\n")
+);
+
+}
+
+// ===========================
+// EXP BANG HỘI
+// ===========================
+
+function addGuildExp(amount){
+
+if(!guild) return;
+
+guild.exp += amount;
+
+if(guild.exp >= 1000){
+
+guild.exp = 0;
+
+guild.level++;
+
+alert(
+"Bang hội lên cấp "
++ guild.level
+);
+
+}
+
+}
+
+// ===========================
+// GUILD WAR
+// ===========================
+
+function guildWar(){
+
+if(!guild){
+
+alert(
+"Bạn chưa có bang hội"
+);
+
+return;
+
+}
+
+let reward =
+guild.level * 1000;
+
+player.gold += reward;
+
+alert(
+"Thắng Guild War!\n+"
++
+reward
++
+" vàng"
+);
+
+}
+
+// ===========================
+// GIẢI ĐẤU PVP
+// ===========================
+
+function tournament(){
+
+let power =
+player.attack +
+player.defense;
+
+if(power > 5000){
+
+player.gold += 50000;
+
+alert(
+"Vô địch giải đấu!"
+);
+
+}else{
+
+alert(
+"Chưa đủ mạnh!"
+);
+
+}
+
+}
+
+// ===========================
+// CHUYỂN SINH
+// ===========================
+
+player.rebirth = 0;
+
+function rebirth(){
+
+if(player.level < 200){
+
+alert(
+"Cần cấp 200!"
+);
+
+return;
+
+}
+
+player.rebirth++;
+
+player.level = 1;
+
+player.attack +=
+player.rebirth * 100;
+
+player.defense +=
+player.rebirth * 100;
+
+player.maxHp +=
+player.rebirth * 1000;
+
+alert(
+"Chuyển sinh lần "
++
+player.rebirth
+);
+
+}
+
+// ===========================
+// PET RỒNG SS
+// ===========================
+
+function evolveDragonSS(){
+
+if(!dragonPet){
+
+alert(
+"Chưa có Pet Rồng"
+);
+
+return;
+
+}
+
+dragonPet.rank = "SS";
+
+dragonPet.attackPower = 20000;
+
+dragonPet.size = 120;
+
+alert(
+"PET RỒNG THẦN SS!"
+);
+
+}
+
+// ===========================
+// TOP 1 SERVER
+// ===========================
+
+function topServerAura(){
+
+ctx.beginPath();
+
+ctx.arc(
+
+player.x+32,
+
+player.y+32,
+
+200,
+
+0,
+
+Math.PI*2
+
+);
+
+ctx.lineWidth = 10;
+
+ctx.strokeStyle =
+"purple";
+
+ctx.stroke();
+
+}
+
+// ===========================
+// PHÍM CHỨC NĂNG
+// ===========================
+
+// G = Tạo Bang Hội
+// Y = Chat Bang
+// U = Xem Chat
+// J = Guild War
+// N = Giải Đấu
+// B = Chuyển Sinh
+// M = Tiến Hóa Rồng SS
+
+window.addEventListener(
+"keydown",
+function(e){
+
+if(e.code==="KeyG")
+createGuild();
+
+if(e.code==="KeyY")
+sendGuildMessage();
+
+if(e.code==="KeyU")
+showGuildChat();
+
+if(e.code==="KeyJ")
+guildWar();
+
+if(e.code==="KeyN")
+tournament();
+
+if(e.code==="KeyB")
+rebirth();
+
+if(e.code==="KeyM")
+evolveDragonSS();
+
+}// ===========================
+// PHẦN 13 GOD UPDATE
+// ===========================
+
+// Vua Server
+player.serverKing = false;
+
+// ===========================
+// HẮC LONG VƯƠNG
+// ===========================
+
+class BlackDragonKing{
+
+constructor(){
+
+this.x = 5000;
+this.y = 5000;
+
+this.maxHp = 10000000;
+this.hp = 10000000;
+
+this.attack = 50000;
+
+this.alive = true;
+
+}
+
+draw(){
+
+if(!this.alive) return;
+
+ctx.fillStyle = "black";
+
+ctx.fillRect(
+this.x,
+this.y,
+300,
+300
+);
+
+ctx.fillStyle = "red";
+
+ctx.fillText(
+"HẮC LONG VƯƠNG",
+this.x,
+this.y - 20
+);
+
+}
+
+hit(damage){
+
+this.hp -= damage;
+
+if(this.hp <= 0){
+
+this.hp = 0;
+
+this.alive = false;
+
+unlockServerKing();
+
+}
+
+}
+
+}
+
+let blackDragonKing =
+new BlackDragonKing();
+
+// ===========================
+// PET RỒNG THẦN SSS
+// ===========================
+
+function evolveDragonSSS(){
+
+if(!dragonPet) return;
+
+dragonPet.rank = "SSS";
+
+dragonPet.size = 200;
+
+dragonPet.attackPower = 100000;
+
+alert(
+"PET RỒNG THẦN SSS!"
+);
+
+}
+
+// ===========================
+// CÁNH CẤP 10
+// ===========================
+
+player.wingLevel = 0;
+
+function upgradeWing(){
+
+if(player.wingLevel < 10){
+
+player.wingLevel++;
+
+}
+
+}
+
+function drawWing10(){
+
+if(player.wingLevel < 10)
+return;
+
+ctx.fillStyle = "cyan";
+
+ctx.fillRect(
+player.x-40,
+player.y,
+20,
+80
+);
+
+ctx.fillRect(
+player.x+80,
+player.y,
+20,
+80
+);
+
+}
+
+// ===========================
+// VUA SERVER
+// ===========================
+
+function unlockServerKing(){
+
+player.serverKing = true;
+
+player.attack += 500000;
+
+player.defense += 500000;
+
+player.maxHp += 5000000;
+
+player.hp = player.maxHp;
+
+player.gold += 9999999;
+
+alert(
+"Bạn đã trở thành VUA SERVER!"
+);
+
+}
+
+function drawKingAura(){
+
+if(!player.serverKing)
+return;
+
+ctx.beginPath();
+
+ctx.arc(
+player.x+32,
+player.y+32,
+250,
+0,
+Math.PI*2
+);
+
+ctx.lineWidth = 12;
+
+ctx.strokeStyle = "gold";
+
+ctx.stroke();
+
+}
+
+// ===========================
+// TRANG BỊ THIÊN ĐẠO
+// ===========================
+
+function giveHeavenSet(){
+
+addItem({
+
+name:"Kiếm Thiên Đạo",
+
+rarity:"Thần Thoại",
+
+atk:1000000
+
+});
+
+addItem({
+
+name:"Giáp Thiên Đạo",
+
+rarity:"Thần Thoại",
+
+def:1000000
+
+});
+
+}
+
+// ===========================
+// MÃ TỐI THƯỢNG
+// ===========================
+
+function supremeCode(){
+
+let code =
+prompt("Nhập mã tối thượng");
+
+if(code==="CHIENDAUDI999"){
+
+player.level = 200;
+
+player.rebirth = 999;
+
+player.attack = 999999;
+
+player.defense = 999999;
+
+player.maxHp = 9999999;
+
+player.hp = player.maxHp;
+
+evolveDragonSSS();
+
+giveHeavenSet();
+
+player.canFly = true;
+
+alert(
+"SỨC MẠNH TỐI THƯỢNG!"
+);
+
+}
+
+}
+
+// ===========================
+// PHÍM Z
+// ===========================
+
+window.addEventListener(
+"keydown",
+function(e){
+
+if(e.code==="KeyZ"){
+
+supremeCode();
+
+}
+
+}
+);
+
+// ===========================
+// GAME LOOP
+// ===========================
+
+// drawKingAura();
+// drawWing10();
+// blackDrag// ===========================
+// PHẦN 14 COSMIC UPDATE
+// ===========================
+
+// Tăng giới hạn cấp
+player.maxLevel = 300;
+
+// ===========================
+// RỒNG VŨ TRỤ
+// ===========================
+
+class CosmicDragon{
+
+constructor(){
+
+this.name = "RỒNG VŨ TRỤ";
+
+this.hp = 50000000;
+
+this.attack = 500000;
+
+this.size = 300;
+
+this.alive = true;
+
+}
+
+draw(){
+
+if(!this.alive) return;
+
+ctx.fillStyle = "blue";
+
+ctx.fillRect(
+2500,
+2500,
+this.size,
+this.size
+);
+
+ctx.fillStyle = "white";
+
+ctx.fillText(
+this.name,
+2500,
+2480
+);
+
+}
+
+hit(dmg){
+
+this.hp -= dmg;
+
+if(this.hp <= 0){
+
+this.alive = false;
+
+unlockCosmicPower();
+
+}
+
+}
+
+}
+
+let cosmicDragon =
+new CosmicDragon();
+
+// ===========================
+// THẦN SẤM
+// ===========================
+
+function thunderSkill(){
+
+for(let enemy of enemies){
+
+if(!enemy.alive)
+continue;
+
+enemy.hit(
+player.attack * 20
+);
+
+}
+
+}
+
+// ===========================
+// CHÚA TỂ BÓNG TỐI
+// ===========================
+
+class DarkLord{
+
+constructor(){
+
+this.hp = 99999999;
+
+this.attack = 999999;
+
+this.alive = true;
+
+}
+
+hit(dmg){
+
+this.hp -= dmg;
+
+if(this.hp <= 0){
+
+this.alive = false;
+
+player.darkLordSlayer = true;
+
+alert(
+"ĐÃ HẠ CHÚA TỂ BÓNG TỐI"
+);
+
+}
+
+}
+
+}
+
+let darkLord =
+new DarkLord();
+
+// ===========================
+// SỨC MẠNH VŨ TRỤ
+// ===========================
+
+function unlockCosmicPower(){
+
+player.attack += 5000000;
+
+player.defense += 5000000;
+
+player.maxHp += 50000000;
+
+player.hp = player.maxHp;
+
+alert(
+"ĐÃ THỨC TỈNH SỨC MẠNH VŨ TRỤ"
+);
+
+}
+
+// ===========================
+// CHUYỂN SINH VÔ HẠN
+// ===========================
+
+function infiniteRebirth(){
+
+player.rebirth++;
+
+player.attack +=
+player.rebirth * 500;
+
+player.defense +=
+player.rebirth * 500;
+
+}
+
+// ===========================
+// CHIẾN TRANH BANG HỘI
+// ===========================
+
+function guildBattle100(){
+
+if(!guild){
+
+alert(
+"Chưa có bang hội"
+);
+
+return;
+
+}
+
+let reward =
+guild.level * 10000;
+
+player.gold += reward;
+
+alert(
+"Thắng chiến tranh bang hội!"
+);
+
+}
+
+// ===========================
+// PET THIÊN HÀ
+// ===========================
+
+function unlockGalaxyPet(){
+
+dragonPet.rank =
+"THIÊN HÀ";
+
+dragonPet.attackPower =
+1000000;
+
+dragonPet.size =
+300;
+
+}
+
+// ===========================
+// MÃ CUỐI
+// ===========================
+
+function finalCode(){
+
+let code =
+prompt(
+"Nhập mã cuối"
+);
+
+if(
+code ===
+"CHIENDAUDI300"
+){
+
+player.level = 300;
+
+player.attack =
+9999999;
+
+player.defense =
+9999999;
+
+player.maxHp =
+99999999;
+
+player.hp =
+player.maxHp;
+
+unlockGalaxyPet();
+
+alert(
+"MAX LEVEL 300!"
+);
+
+}
+
+}
+
+// ===========================
+// PHÍM X
+// ===========================
+
+window.addEventListener(
+"keydown",
+function(e){
+
+if(e.code==="KeyX"){
+
+finalCode();
+
+}
+
+});onKing.draw();
+);
