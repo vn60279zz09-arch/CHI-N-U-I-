@@ -225,6 +225,233 @@ Nhiệm vụ: Chưa nhận
 
 <button onclick="attackMonster()">
 ⚔️ Tấn Công Quái
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<title>CHIẾN ĐẤU ĐI ONLINE</title>
+
+<style>
+body{
+    background:black;
+    color:white;
+    font-family:Arial;
+    text-align:center;
+}
+
+.box{
+    border:2px solid white;
+    width:700px;
+    margin:auto;
+    padding:20px;
+}
+
+button{
+    padding:10px 20px;
+    margin:5px;
+    font-size:20px;
+}
+
+#avatar{
+    font-size:80px;
+}
+
+h1{
+    color:gold;
+}
+</style>
+</head>
+
+<body>
+
+<h1>⚔️ CHIẾN ĐẤU ĐI ONLINE ⚔️</h1>
+
+<div class="box">
+
+<div id="avatar">👷</div>
+
+<h2 id="name">Công Nhân</h2>
+
+<p>Level: <span id="level">1</span>/200</p>
+<p>EXP: <span id="exp">0</span></p>
+<p>Vàng: <span id="gold">0</span></p>
+<p>Sức mạnh: <span id="power">100</span></p>
+<p>Máu: <span id="hp">1000</span></p>
+<p>Đảo hiện tại: <span id="island">Đảo Khởi Đầu</span></p>
+<p>Võ công: <span id="skill">Chưa có</span></p>
+
+<button onclick="fight()">⚔️ Đánh Quái</button>
+<button onclick="travel()">🌍 Sang Đảo</button>
+<button onclick="randomSkill()">🎁 Random Võ</button>
+<button onclick="phone()">📱 Điện Thoại</button>
+
+<h3 id="msg"></h3>
+
+</div>
+
+<script>
+
+let level=1;
+let exp=0;
+let gold=0;
+let power=100;
+let hp=1000;
+
+let island=1;
+let skill="Chưa có";
+
+function update(){
+
+document.getElementById("level").innerText=level;
+document.getElementById("exp").innerText=exp;
+document.getElementById("gold").innerText=gold;
+document.getElementById("power").innerText=power;
+document.getElementById("hp").innerText=hp;
+document.getElementById("skill").innerText=skill;
+
+let islandName=[
+"Đảo Khởi Đầu",
+"Đảo Quỷ",
+"Đảo Trời",
+"Đảo Rừng",
+"Đảo Ma",
+"Đảo Nhà Tù"
+];
+
+document.getElementById("island").innerText=islandName[island-1];
+
+if(level>=50){
+document.getElementById("avatar").innerText="🦸";
+document.getElementById("name").innerText="SUPERMAN";
+}
+
+if(level>=100){
+document.getElementById("name").innerText="TÙY CHỈNH NGOẠI HÌNH";
+}
+
+localStorage.setItem("level",level);
+localStorage.setItem("exp",exp);
+localStorage.setItem("gold",gold);
+localStorage.setItem("power",power);
+localStorage.setItem("hp",hp);
+localStorage.setItem("skill",skill);
+localStorage.setItem("island",island);
+
+}
+
+function fight(){
+
+let gain=Math.floor(Math.random()*50)+20;
+
+exp+=gain;
+gold+=gain*2;
+
+document.getElementById("msg").innerText=
+"Bạn đánh chết quái và nhận "+gain+" EXP";
+
+while(exp>=level*100 && level<200){
+
+exp-=level*100;
+level++;
+
+power+=50;
+hp+=200;
+
+}
+
+update();
+
+}
+
+function travel(){
+
+if(level<50){
+alert("Cần level 50 mới sang đảo tiếp theo");
+return;
+}
+
+if(island<6){
+island++;
+alert("Đã tới đảo mới");
+}
+
+update();
+
+}
+
+function randomSkill(){
+
+let r=Math.random()*100;
+
+if(r<=50){
+skill="🐟 Võ Cá";
+}
+else if(r<=99){
+skill="🔥 Võ Lửa";
+}
+else{
+skill="⚡ Võ Điện";
+}
+
+update();
+
+}
+
+function phone(){
+
+let code=prompt("Nhập mã điện thoại");
+
+if(code=="0000"){
+
+level=200;
+power=999999;
+hp=999999;
+skill="⚡ Võ Điện";
+
+alert("MAX CẤP THÀNH CÔNG");
+
+update();
+
+}
+
+}
+
+if(localStorage.getItem("level")){
+
+level=parseInt(localStorage.getItem("level"));
+exp=parseInt(localStorage.getItem("exp"));
+gold=parseInt(localStorage.getItem("gold"));
+power=parseInt(localStorage.getItem("power"));
+hp=parseInt(localStorage.getItem("hp"));
+island=parseInt(localStorage.getItem("island"));
+skill=localStorage.getItem("skill");
+
+}
+
+update();
+
+</script>
+<div class="box">
+<h2>👴 NPC Trưởng Làng</h2>
+
+<p id="quest">
+Nhiệm vụ: Chưa nhận
+</p>
+
+<button onclick="getQuest()">
+📜 Nhận Nhiệm Vụ
+</button>
+</div>
+
+<div class="box">
+<h2>👹 Quái Vật</h2>
+
+<p>Tên: <span id="monsterName">Thỏ Rừng</span></p>
+
+<p>Máu: <span id="monsterHp">100</span></p>
+
+<button onclick="attackMonster()">
+⚔️ Tấn Công Quái
 </button>
 </div>
 </body>
