@@ -1,242 +1,147 @@
 <!DOCTYPE html>
-
-<html lang="vi">
-
+<html>
 <head>
-
 <meta charset="UTF-8">
-
-<title>Chiến Đấu Đi!</title>
-
+<title>Chiến Đấu Đi</title>
 <style>
-
 body{
-
-&#x20;   font-family:Arial;
-
-&#x20;   background:#111;
-
-&#x20;   color:white;
-
-&#x20;   text-align:center;
-
+    margin:0;
+    background:#222;
+    color:white;
+    font-family:Arial;
+    text-align:center;
 }
-
-button{
-
-&#x20;   padding:10px;
-
-&#x20;   margin:5px;
-
-&#x20;   font-size:16px;
-
+#game{
+    width:800px;
+    height:500px;
+    background:#4aa3ff;
+    margin:auto;
+    position:relative;
+    overflow:hidden;
 }
-
-.box{
-
-&#x20;   border:1px solid white;
-
-&#x20;   width:500px;
-
-&#x20;   margin:auto;
-
-&#x20;   padding:15px;
-
+#player{
+    width:40px;
+    height:40px;
+    background:green;
+    position:absolute;
+    left:100px;
+    top:100px;
 }
-
+.enemy{
+    width:40px;
+    height:40px;
+    background:red;
+    position:absolute;
+}
 </style>
-
 </head>
-
 <body>
 
+<h1>CHIẾN ĐẤU ĐI</h1>
 
-
-<h1>⚔️ CHIẾN ĐẤU ĐI! ⚔️</h1>
-
-<h2>Nhân vật: Admin Dương Minh Đức</h2>
-
-
-
-<div class="box">
-
-&#x20;   <p>Level: <span id="level">1</span>/200</p>
-
-&#x20;   <p>EXP: <span id="exp">0</span></p>
-
-&#x20;   <p>Kill: <span id="kill">0</span></p>
-
-&#x20;   <p>Vàng: <span id="gold">0</span></p>
-
-&#x20;   <p>Sức mạnh: <span id="power">100</span></p>
-
-&#x20;   <p>Máu: <span id="hp">1000</span></p>
-
-&#x20;   <p>Võ công: <span id="skill">Chưa có</span></p>
-
+<div>
+Level: <span id="lv">1</span>
+|
+XP: <span id="xp">0</span>
+|
+Máu: <span id="hp">100</span>
 </div>
 
+<button onclick="secret()">Nhập Mã Bí Mật</button>
 
+<h3 id="mapName">Đảo Quỷ</h3>
 
-<br>
-
-
-
-<button onclick="fight()">⚔️ Đánh quái</button>
-
-<button onclick="teleport()">🌀 Dịch chuyển (50.000 vàng)</button>
-
-
-
-<h3 id="msg"></h3>
-
-
+<div id="game">
+    <div id="player"></div>
+</div>
 
 <script>
 
-let level = 1;
+let player=document.getElementById("player");
 
-let exp = 0;
+let x=100;
+let y=100;
 
-let kill = 0;
+let level=1;
+let xp=0;
+let hp=100;
 
-let gold = 0;
-
-let power = 100;
-
-let hp = 1000;
-
-let skill = "Chưa có";
-
-
-
-function update(){
-
-&#x20;   document.getElementById("level").innerText = level;
-
-&#x20;   document.getElementById("exp").innerText = exp;
-
-&#x20;   document.getElementById("kill").innerText = kill;
-
-&#x20;   document.getElementById("gold").innerText = gold;
-
-&#x20;   document.getElementById("power").innerText = power;
-
-&#x20;   document.getElementById("hp").innerText = hp;
-
-&#x20;   document.getElementById("skill").innerText = skill;
-
+function updateUI(){
+    lv.innerText=level;
+    document.getElementById("xp").innerText=xp;
+    document.getElementById("hp").innerText=hp;
 }
 
+document.addEventListener("keydown",e=>{
 
+    if(e.key=="w") y-=10;
+    if(e.key=="s") y+=10;
+    if(e.key=="a") x-=10;
+    if(e.key=="d") x+=10;
 
-function fight(){
+    player.style.left=x+"px";
+    player.style.top=y+"px";
+});
 
-&#x20;   kill++;
+function spawnEnemy(){
 
-&#x20;   exp += 100;
+    let e=document.createElement("div");
+    e.className="enemy";
 
-&#x20;   gold += 20000;
+    e.style.left=Math.random()*700+"px";
+    e.style.top=Math.random()*400+"px";
 
+    document.getElementById("game").appendChild(e);
 
+    e.onclick=function(){
 
-&#x20;   while(level < 200 \&\& exp >= level \* 100){
+        xp+=10;
 
-&#x20;       exp -= level \* 100;
+        if(xp>=100){
+            xp=0;
+            level++;
 
-&#x20;       level++;
+            hp+=20;
 
+            if(level==50)
+                mapName.innerText="Đảo Đầu Lâu";
 
+            if(level==100)
+                mapName.innerText="Đảo Trời";
 
-&#x20;       power += 50;
+            if(level==150)
+                mapName.innerText="Đảo Ma";
+        }
 
-&#x20;       hp += 100;
+        updateUI();
 
-&#x20;   }
-
-
-
-&#x20;   if(level >= 200){
-
-&#x20;       level = 200;
-
-&#x20;   }
-
-
-
-&#x20;   document.getElementById("msg").innerText =
-
-&#x20;       "Bạn đã hạ được đối thủ!";
-
-
-
-&#x20;   update();
-
+        e.remove();
+        spawnEnemy();
+    };
 }
 
-
-
-function teleport(){
-
-
-
-&#x20;   if(gold < 50000){
-
-&#x20;       alert("Cần 50.000 vàng!");
-
-&#x20;       return;
-
-&#x20;   }
-
-
-
-&#x20;   gold -= 50000;
-
-
-
-&#x20;   let r = Math.random() \* 100;
-
-
-
-&#x20;   if(r < 20){
-
-&#x20;       skill = "⚡ Võ Điện";
-
-&#x20;   }
-
-&#x20;   else if(r < 50){
-
-&#x20;       skill = "🔥 Võ Lửa";
-
-&#x20;   }
-
-&#x20;   else{
-
-&#x20;       skill = "🐟 Võ Cá";
-
-&#x20;   }
-
-
-
-&#x20;   document.getElementById("msg").innerText =
-
-&#x20;       "Bạn nhận được: " + skill;
-
-
-
-&#x20;   update();
-
+for(let i=0;i<5;i++){
+    spawnEnemy();
 }
 
+function secret(){
 
+    let code=prompt("Nhập mã:");
 
-update();
+    if(code=="000"){
+
+        level=200;
+        hp=9999;
+
+        alert("Mở khóa cấp 200 và khả năng bay!");
+    }
+
+    updateUI();
+}
+
+updateUI();
 
 </script>
 
-
-
 </body>
-
 </html>
-
