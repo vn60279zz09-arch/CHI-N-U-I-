@@ -4625,3 +4625,43 @@ function attack(){
 }if(e.code==="KeyJ"){
     // Chém kiếm
 }
+// ====================
+// NHÂN VẬT MẶC ĐỊNH
+// ====================
+
+const player = {
+
+    name: "Tân Thủ",
+    class: "Cung Thủ",
+
+    x: 300,
+    y: 200,
+
+    level: 1,
+    attack: 15,
+    hp: 100
+
+};
+
+// Ảnh Cung Thủ
+const playerImg = new Image();
+
+playerImg.src = "cungthu.png";
+
+// Vẽ nhân vật
+function drawPlayer(){
+
+    ctx.drawImage(
+        playerImg,
+        player.x,
+        player.y,
+        64,
+        64
+    );
+CHIENDAUDI/
+
+index.html
+game.js
+
+cungthu.png
+}
