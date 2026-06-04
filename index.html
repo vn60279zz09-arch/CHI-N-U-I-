@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="vi">
 <head>
 <meta charset="UTF-8">
 <title>Game Pixel</title>
@@ -9,6 +9,7 @@ body{
 margin:0;
 background:#87CEEB;
 overflow:hidden;
+font-family:Arial;
 }
 
 #map{
@@ -54,60 +55,52 @@ padding:10px;
 
 <body>
 
-<<!DOCTYPE html>
-<html>
-<head>
-<meta charset="UTF-8">
-<title>Game Pixel</title>
+<div id="info">
+WASD hoặc phím mũi tên để di chuyển
+</div>
 
-<style>
-body{
-margin:0;
-background:#87CEEB;
-overflow:hidden;
+<div id="map">
+
+<div id="player"></div>
+
+<div id="npc">👴</div>
+
+<div id="monster">👹</div>
+
+</div>
+
+<script>
+
+let player=document.getElementById("player");
+
+let x=100;
+let y=100;
+let speed=10;
+
+document.addEventListener("keydown",function(e){
+
+if(e.key=="w" || e.key=="ArrowUp"){
+y-=speed;
 }
 
-#map{
-width:100vw;
-height:100vh;
-background:#55aa55;
-position:relative;
+if(e.key=="s" || e.key=="ArrowDown"){
+y+=speed;
 }
 
-#player{
-width:50px;
-height:50px;
-background:gold;
-position:absolute;
-left:100px;
-top:100px;
-border:2px solid black;
+if(e.key=="a" || e.key=="ArrowLeft"){
+x-=speed;
 }
 
-#npc{
-position:absolute;
-left:300px;
-top:150px;
-font-size:50px;
+if(e.key=="d" || e.key=="ArrowRight"){
+x+=speed;
 }
 
-#monster{
-position:absolute;
-left:600px;
-top:250px;
-font-size:50px;
-}
+player.style.left=x+"px";
+player.style.top=y+"px";
 
-#info{
-position:fixed;
-top:10px;
-left:10px;
-background:white;
-padding:10px;
-}
-</style>
-</head>
+});
 
-<body>
+</script>
 
-<divdiv
+</body>
+</html>
