@@ -1,126 +1,214 @@
-<!DOCTYPE html> 
+
+<!DOCTYPE html>
 <html lang="vi">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>⚔️ Chiến Đấu Đi! ⚔️</title>
+<title>CHIẾN ĐẤU ĐI ONLINE</title>
 
 <style>
 body{
-    background:#111;
+    background:black;
     color:white;
-    font-family:Arial,sans-serif;
+    font-family:Arial;
     text-align:center;
 }
 
 .box{
     border:2px solid white;
-    width:500px;
-    max-width:90%;
+    width:700px;
     margin:auto;
     padding:20px;
 }
 
 button{
-    padding:12px 20px;
+    padding:10px;
     margin:5px;
     font-size:18px;
-    cursor:pointer;
+}
+
+#avatar{
+    font-size:100px;
 }
 </style>
 </head>
 
 <body>
 
-<h1>⚔️ CHIẾN ĐẤU ĐI! ⚔️</h1>
-<h2>Nhân vật: Admin Dương Minh Đức</h2>
+<h1>⚔️ CHIẾN ĐẤU ĐI ONLINE ⚔️</h1>
+
+<div id="avatar">👷</div>
+
+<h2 id="name">Công Nhân</h2>
 
 <div class="box">
-    <p>Level: <span id="level">1</span>/200</p>
-    <p>EXP: <span id="exp">0</span></p>
-    <p>Kill: <span id="kill">0</span></p>
-    <p>Vàng: <span id="gold">0</span></p>
-    <p>Sức mạnh: <span id="power">100</span></p>
-    <p>Máu: <span id="hp">1000</span></p>
-    <p>Võ công: <span id="skill">Chưa có</span></p>
+
+<p>Level: <span id="level">1</span>/200</p>
+
+<p>EXP: <span id="exp">0</span></p>
+
+<p>Máu: <span id="hp">1000</span></p>
+
+<p>Sức mạnh: <span id="power">100</span></p>
+
+<p>Vàng: <span id="gold">0</span></p>
+
+<p>Võ Công: <span id="skill">Chưa Có</span></p>
+
+<p>Đảo: <span id="island">Đảo Khởi Đầu</span></p>
+
 </div>
 
 <br>
 
-<button onclick="fight()">⚔️ Đánh quái</button>
-<button onclick="teleport()">🌀 Dịch chuyển (50.000 vàng)</button>
+<button onclick="fight()">⚔️ Đánh Quái</button>
 
-<h3 id="msg"></h3>
+<button onclick="randomSkill()">🎲 Random Võ</button>
+
+<button onclick="phone()">📱 Điện Thoại</button>
+
+<button onclick="changeSkin()">🎭 Đổi Ngoại Hình</button>
+
+<h2 id="msg"></h2>
 
 <script>
 
-let level = 1;
-let exp = 0;
-let kill = 0;
-let gold = 0;
-let power = 100;
-let hp = 1000;
-let skill = "Chưa có";
+let level=1;
+let exp=0;
+let hp=1000;
+let power=100;
+let gold=0;
+
+let skill="Chưa Có";
+
+let island="Đảo Khởi Đầu";
 
 function update(){
-    document.getElementById("level").textContent = level;
-    document.getElementById("exp").textContent = exp;
-    document.getElementById("kill").textContent = kill;
-    document.getElementById("gold").textContent = gold;
-    document.getElementById("power").textContent = power;
-    document.getElementById("hp").textContent = hp;
-    document.getElementById("skill").textContent = skill;
+
+document.getElementById("level").innerText=level;
+document.getElementById("exp").innerText=exp;
+document.getElementById("hp").innerText=hp;
+document.getElementById("power").innerText=power;
+document.getElementById("gold").innerText=gold;
+document.getElementById("skill").innerText=skill;
+document.getElementById("island").innerText=island;
+
+if(level>=50){
+document.getElementById("avatar").innerText="🦸";
+document.getElementById("name").innerText="SUPERMAN";
+}
+
+if(level>=50){
+island="Đảo Trời";
+}
+
+if(level>=80){
+island="Đảo Rừng";
+}
+
+if(level>=120){
+island="Đảo Ma";
+}
+
+if(level>=160){
+island="Đảo Nhà Tù";
+}
+
 }
 
 function fight(){
 
-    kill++;
-    exp += 100;
-    gold += 20000;
+let damage=3;
 
-    while(level < 200 && exp >= level * 100){
-        exp -= level * 100;
-        level++;
-
-        power += 50;
-        hp += 100;
-    }
-
-    if(level > 200){
-        level = 200;
-    }
-
-    document.getElementById("msg").textContent =
-        "Bạn đã hạ được đối thủ!";
-
-    update();
+if(skill=="⚡ Võ Điện"){
+damage=999999;
 }
 
-function teleport(){
+exp+=100;
+gold+=1000;
 
-    if(gold < 50000){
-        alert("Cần 50.000 vàng!");
-        return;
-    }
+while(exp>=level*100 && level<200){
 
-    gold -= 50000;
+exp-=level*100;
+level++;
 
-    let r = Math.random() * 100;
+hp+=500;
+power+=200;
 
-    if(r < 20){
-        skill = "⚡ Võ Điện";
-    }
-    else if(r < 50){
-        skill = "🔥 Võ Lửa";
-    }
-    else{
-        skill = "🐟 Võ Cá";
-    }
+}
 
-    document.getElementById("msg").textContent =
-        "Bạn nhận được: " + skill;
+document.getElementById("msg").innerText=
+"Bạn đánh quái gây "+damage+" sát thương!";
 
-    update();
+update();
+
+}
+
+function randomSkill(){
+
+let r=Math.random()*100;
+
+if(r<1){
+
+skill="⚡ Võ Điện";
+
+}
+else if(r<50){
+
+skill="🔥 Võ Lửa";
+
+}
+else{
+
+skill="🐟 Võ Cá";
+
+}
+
+document.getElementById("msg").innerText=
+"Bạn nhận được "+skill;
+
+update();
+
+}
+
+function phone(){
+
+let code=prompt("Nhập mật mã:");
+
+if(code=="0000"){
+
+level=200;
+power=9999999;
+hp=9999999;
+skill="⚡ Võ Điện";
+
+alert("MAX CẤP!");
+
+}
+
+update();
+
+}
+
+function changeSkin(){
+
+if(level<100){
+
+alert("Level 100 mới đổi được!");
+
+return;
+
+}
+
+let skin=prompt(
+"Nhập emoji nhân vật:"
+);
+
+if(skin){
+
+document.getElementById("avatar").innerText=skin;
+
+}
+
 }
 
 update();
