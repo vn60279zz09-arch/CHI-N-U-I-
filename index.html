@@ -4443,7 +4443,185 @@ action = WALK;
 
 4 hướng:
 ↓ Xuống
-← Trái
+← Trái// ======================
+// ĐIỆN THOẠI TỪ KHI VÀO GAME
+// ======================
+
+let phoneOpen = true;
+
+// Danh mục
+let phoneMenu = [
+
+"1. Mã Bí Mật",
+"2. Túi Đồ",
+"3. Nhiệm Vụ",
+"4. Pet Rồng",
+"5. Bảng Xếp Hạng",
+"6. Đóng"
+
+];
+
+// ======================
+// VẼ ĐIỆN THOẠI
+// ======================
+
+function drawPhone(){
+
+if(!phoneOpen) return;
+
+ctx.fillStyle = "black";
+
+ctx.fillRect(
+650,
+50,
+300,
+500
+);
+
+ctx.fillStyle = "white";
+
+ctx.font = "20px Arial";
+
+ctx.fillText(
+"ĐIỆN THOẠI",
+730,
+90
+);
+
+for(let i=0;i<phoneMenu.length;i++){
+
+ctx.fillText(
+
+phoneMenu[i],
+
+690,
+
+150 + i * 50
+
+);
+
+}
+
+}
+
+// ======================
+// MÃ BÍ MẬT
+// ======================
+
+function openSecretCode(){
+
+let code =
+prompt("Nhập mã");
+
+if(code==="0000"){
+
+player.level = 300;
+
+player.attack += 999999;
+
+player.defense += 999999;
+
+player.maxHp += 9999999;
+
+player.hp = player.maxHp;
+
+alert("MAX CẤP!");
+
+}
+
+}
+
+// ======================
+// PHÍM ĐIỆN THOẠI
+// ======================
+
+window.addEventListener(
+"keydown",
+function(e){
+
+if(e.code==="KeyF"){
+
+phoneOpen = !phoneOpen;
+
+}
+
+if(e.code==="Digit1"){
+
+openSecretCode();
+
+}
+
+}
+);
+
+// ======================
+// GAME LOOP
+// ======================
+
+// drawPhone();
 → Phải
 ↑ LênLOOP
 // drawPhone();
+// Ảnh nhân vật
+const playerImg = new Image();
+playerImg.src = "kiemsi.png";
+
+// Nhân vật
+const player = {
+    x: 300,
+    y: 200,
+    w: 64,
+    h: 64
+};
+
+function drawPlayer(){
+
+    ctx.drawImage(
+        playerImg,
+        player.x,
+        player.y,
+        player.w,
+        player.h
+    );CHIENDAUDI/function drawPlayer(){
+
+    // Đầu
+    ctx.fillStyle = "#FFD8B0";
+    ctx.fillRect(player.x+20, player.y, 24, 24);
+
+    // Áo giáp
+    ctx.fillStyle = "#3A6EA5";
+    ctx.fillRect(player.x+16, player.y+24, 32, 24);
+
+    // Chân
+    ctx.fillStyle = "#555";
+    ctx.fillRect(player.x+18, player.y+48, 10, 16);
+    ctx.fillRect(player.x+36, player.y+48, 10, 16);
+
+    // Kiếm
+    ctx.fillStyle = "#CCCCCC";
+    ctx.fillRect(player.x+48, player.y+20, 16, 4);
+}
+│
+├── index.html
+├── game.js
+├── kiemsi.png
+├── cungthu.png
+├── satthu.png
+└── dragon.png
+canvas.addEventListener(
+"click",
+function(){
+
+    attack();
+
+}
+);
+
+function attack(){
+
+    console.log("Đánh!");
+
+}
+}if(e.code==="KeyJ"){
+    // Chém kiếm
+}
