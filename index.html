@@ -1,17 +1,99 @@
-// ====================
-// NHÂN VẬT MẶC ĐỊNH
-// ====================
+from pathlib import Path
 
-const player = {
-    name: "Tân Thủ",
-    class: "Cung Thủ",
-    x: 300,
-    y: 200,
-    level: 1,
-    hp: 100,
-    attack: 15
-};
+html = r"""<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<title>Hành Tinh Pha Lê</title>
+<style>
+body{margin:0;background:#111;color:white;font-family:Arial;text-align:center}
+canvas{background:#222;border:2px solid #fff;margin-top:10px}
+</style>
+</head>
+<body>
+<h1>Hành Tinh Pha Lê</h1>
+<p>Dùng phím ← ↑ ↓ → để di chuyển. Thu thập pha lê và tránh quái vật.</p>
+<canvas id="game" width="800" height="500"></canvas>
 
-// Ảnh Cung Thủ
-const playerImg = new Image();
-playerImg.src = "cungthu.png";
+<script>
+const c=document.getElementById("game");
+const ctx=c.getContext("2d");
+
+let player={x:50,y:50,size:25,score:0};
+let crystal={x:300,y:200,size:18};
+let enemy={x:700,y:300,size:30,vx:-2,vy:2};
+
+const keys={};
+
+document.addEventListener("keydown",e=>keys[e.key]=true);
+document.addEventListener("keyup",e=>keys[e.key]=false);
+
+function spawnCrystal(){
+ crystal.x=Math.random()*760+20;
+ crystal.y=Math.random()*460+20;
+}
+
+function update(){
+ if(keys["ArrowLeft"]) player.x-=4;
+ if(keys["ArrowRight"]) player.x+=4;
+ if(keys["ArrowUp"]) player.y-=4;
+ if(keys["ArrowDown"]) player.y+=4;
+
+ player.x=Math.max(0,Math.min(775,player.x));
+ player.y=Math.max(0,Math.min(475,player.y));
+
+ enemy.x+=enemy.vx;
+ enemy.y+=enemy.vy;
+
+ if(enemy.x<0||enemy.x>770) enemy.vx*=-1;
+ if(enemy.y<0||enemy.y>470) enemy.vy*=-1;
+
+ let dx=player.x-crystal.x;
+ let dy=player.y-crystal.y;
+ if(Math.hypot(dx,dy)<25){
+   player.score++;
+   spawnCrystal();
+ }
+
+ let ex=player.x-enemy.x;
+ let ey=player.y-enemy.y;
+ if(Math.hypot(ex,ey)<30){
+   alert("Game Over! Điểm: "+player.score);
+   player.x=50;
+   player.y=50;
+   player.score=0;
+ }
+}
+
+function draw(){
+ ctx.clearRect(0,0,c.width,c.height);
+
+ ctx.fillStyle="lime";
+ ctx.fillRect(player.x,player.y,player.size,player.size);
+
+ ctx.fillStyle="cyan";
+ ctx.beginPath();
+ ctx.arc(crystal.x,crystal.y,crystal.size,0,Math.PI*2);
+ ctx.fill();
+
+ ctx.fillStyle="red";
+ ctx.fillRect(enemy.x,enemy.y,enemy.size,enemy.size);
+
+ ctx.fillStyle="white";
+ ctx.font="24px Arial";
+ ctx.fillText("Điểm: "+player.score,10,30);
+}
+
+function loop(){
+ update();
+ draw();
+ requestAnimationFrame(loop);
+}
+loop();
+</script>
+</body>
+</html>"""
+
+path = "/mnt/data/Hanh_Tinh_Pha_Le.html"
+Path(path).write_text(html, encoding="utf-8")
+print(path)
