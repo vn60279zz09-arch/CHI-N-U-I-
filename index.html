@@ -97,3 +97,887 @@ loop();
 path = "/mnt/data/Hanh_Tinh_Pha_Le.html"
 Path(path).write_text(html, encoding="utf-8")
 print(path)
+from pathlib import Path
+
+html = """<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<title>Chiến Binh Pha Lê</title>
+<style>
+body{background:#111;color:white;text-align:center;font-family:Arial}
+canvas{background:#1b1b1b;border:3px solid white}
+</style>
+</head>
+<body>
+<h1>Chiến Binh Pha Lê</h1>
+<p>Nhân vật được vẽ bằng code, không dùng emoji.</p>
+<canvas id="game" width="900" height="500"></canvas>
+
+<script>
+const canvas=document.getElementById("game");
+const ctx=canvas.getContext("2d");
+
+const p={x:100,y:250,speed:5,score:0};
+const crystal={x:600,y:200};
+const enemy={x:750,y:250,vx:-3};
+
+const keys={};
+onkeydown=e=>keys[e.key]=true;
+onkeyup=e=>keys[e.key]=false;
+
+function drawHero(x,y){
+  ctx.fillStyle="#3fa9f5";
+  ctx.fillRect(x-12,y-20,24,30); // thân
+  ctx.fillStyle="#ffd39b";
+  ctx.beginPath();
+  ctx.arc(x,y-32,10,0,Math.PI*2); // đầu
+  ctx.fill();
+  ctx.strokeStyle="white";
+  ctx.lineWidth=3;
+  ctx.beginPath();
+  ctx.moveTo(x-8,y+10);
+  ctx.lineTo(x-12,y+25);
+  ctx.moveTo(x+8,y+10);
+  ctx.lineTo(x+12,y+25);
+  ctx.moveTo(x-18,y-5);
+  ctx.lineTo(x+18,y-5);
+  ctx.stroke();
+}
+
+function spawnCrystal(){
+ crystal.x=Math.random()*800+40;
+ crystal.y=Math.random()*400+40;
+}
+
+function update(){
+ if(keys["ArrowLeft"]) p.x-=p.speed;
+ if(keys["ArrowRight"]) p.x+=p.speed;
+ if(keys["ArrowUp"]) p.y-=p.speed;
+ if(keys["ArrowDown"]) p.y+=p.speed;
+
+ enemy.x+=enemy.vx;
+ if(enemy.x<50||enemy.x>850) enemy.vx*=-1;
+
+ if(Math.hypot(p.x-crystal.x,p.y-crystal.y)<30){
+   p.score++;
+   spawnCrystal();
+ }
+
+ if(Math.hypot(p.x-enemy.x,p.y-enemy.y)<35){
+   alert("Thua! Điểm: "+p.score);
+   p.score=0;
+   p.x=100;
+   p.y=250;
+ }
+}
+
+function draw(){
+ ctx.clearRect(0,0,900,500);
+
+ drawHero(p.x,p.y);
+
+ ctx.fillStyle="cyan";
+ ctx.beginPath();
+ ctx.moveTo(crystal.x,crystal.y-15);
+ ctx.lineTo(crystal.x+12,crystal.y);
+ ctx.lineTo(crystal.x,crystal.y+15);
+ ctx.lineTo(crystal.x-12,crystal.y);
+ ctx.fill();
+
+ ctx.fillStyle="red";
+ ctx.fillRect(enemy.x-15,enemy.y-15,30,30);
+
+ ctx.fillStyle="white";
+ ctx.font="24px Arial";
+ ctx.fillText("Điểm: "+p.score,20,35);
+ }
+
+function loop(){
+ update();
+ draw();
+ requestAnimationFrame(loop);
+}
+loop();
+</script>
+</body>
+</html>
+"""
+
+path="/mnt/data/Chien_Binh_Pha_Le.html"
+Path(path).write_text(html,encoding="utf-8")
+print(path)
+from pathlib import Path
+
+html = """<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<title>Kiếm Sĩ Pha Lê</title>
+<style>
+body{background:#111;color:white;text-align:center;font-family:Arial}
+canvas{background:#1b1b1b;border:3px solid white}
+</style>
+</head>
+<body>
+<h1>Kiếm Sĩ Pha Lê</h1>
+<p>Di chuyển: ← ↑ ↓ → | Tấn công: SPACE</p>
+<canvas id="game" width="900" height="500"></canvas>
+
+<script>
+const canvas=document.getElementById("game");
+const ctx=canvas.getContext("2d");
+
+const p={x:100,y:250,hp:5,score:0};
+let attacking=false;
+
+const enemies=[
+{x:700,y:150,hp:3},
+{x:750,y:320,hp:3},
+{x:600,y:250,hp:3}
+];
+
+const keys={};
+onkeydown=e=>{
+ keys[e.key]=true;
+ if(e.code==="Space") attacking=true;
+};
+onkeyup=e=>{
+ keys[e.key]=false;
+ if(e.code==="Space") attacking=false;
+};
+
+function drawHero(){
+ const x=p.x,y=p.y;
+
+ ctx.fillStyle="#3fa9f5";
+ ctx.fillRect(x-12,y-20,24,30);
+
+ ctx.fillStyle="#ffd39b";
+ ctx.beginPath();
+ ctx.arc(x,y-32,10,0,Math.PI*2);
+ ctx.fill();
+
+ ctx.strokeStyle="white";
+ ctx.lineWidth=3;
+ ctx.beginPath();
+ ctx.moveTo(x-8,y+10); ctx.lineTo(x-12,y+25);
+ ctx.moveTo(x+8,y+10); ctx.lineTo(x+12,y+25);
+ ctx.moveTo(x-18,y-5); ctx.lineTo(x+18,y-5);
+ ctx.stroke();
+
+ ctx.strokeStyle="silver";
+ ctx.lineWidth=5;
+ if(attacking){
+   ctx.beginPath();
+   ctx.moveTo(x+18,y-5);
+   ctx.lineTo(x+55,y-25);
+   ctx.stroke();
+ }else{
+   ctx.beginPath();
+   ctx.moveTo(x+18,y-5);
+   ctx.lineTo(x+40,y-5);
+   ctx.stroke();
+ }
+}
+
+function update(){
+ if(keys["ArrowLeft"]) p.x-=5;
+ if(keys["ArrowRight"]) p.x+=5;
+ if(keys["ArrowUp"]) p.y-=5;
+ if(keys["ArrowDown"]) p.y+=5;
+
+ for(let i=enemies.length-1;i>=0;i--){
+   let e=enemies[i];
+
+   if(attacking && Math.hypot(p.x-e.x,p.y-e.y)<70){
+      e.hp--;
+      attacking=false;
+      if(e.hp<=0){
+         enemies.splice(i,1);
+         p.score+=10;
+      }
+   }
+
+   if(Math.hypot(p.x-e.x,p.y-e.y)<30){
+      p.hp--;
+      e.x+=50;
+      if(p.hp<=0){
+         alert("Game Over! Điểm: "+p.score);
+         location.reload();
+      }
+   }
+ }
+}
+
+function draw(){
+ ctx.clearRect(0,0,900,500);
+
+ drawHero();
+
+ enemies.forEach(e=>{
+   ctx.fillStyle="red";
+   ctx.fillRect(e.x-15,e.y-15,30,30);
+
+   ctx.fillStyle="white";
+   ctx.fillText(e.hp,e.x-5,e.y-20);
+ });
+
+ ctx.fillStyle="white";
+ ctx.font="22px Arial";
+ ctx.fillText("Điểm: "+p.score,20,30);
+ ctx.fillText("HP: "+p.hp,20,60);
+
+ if(enemies.length===0){
+   ctx.font="40px Arial";
+   ctx.fillText("CHIẾN THẮNG!",320,250);
+ }
+}
+
+function loop(){
+ update();
+ draw();
+ requestAnimationFrame(loop);
+}
+loop();
+</script>
+</body>
+</html>
+"""
+
+path = "/mnt/data/Kiem_Si_Pha_Le.html"
+Path(path).write_text(html, encoding="utf-8")
+print(path)
+from pathlib import Path
+
+html = """<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<title>Kiếm Sĩ Pha Lê - Quái Truy Đuổi</title>
+<style>
+body{background:#111;color:white;text-align:center;font-family:Arial}
+canvas{background:#1b1b1b;border:3px solid white}
+</style>
+</head>
+<body>
+<h1>Kiếm Sĩ Pha Lê</h1>
+<p>⬅️➡️⬆️⬇️ Di chuyển | SPACE Chém kiếm</p>
+<canvas id="game" width="900" height="500"></canvas>
+
+<script>
+const c=document.getElementById("game");
+const ctx=c.getContext("2d");
+
+const p={x:100,y:250,hp:10,score:0};
+let attacking=false;
+
+const enemies=[];
+for(let i=0;i<5;i++){
+ enemies.push({x:600+i*40,y:100+i*60,hp:3,speed:1.2});
+}
+
+const keys={};
+
+onkeydown=e=>{
+ keys[e.key]=true;
+ if(e.code==="Space") attacking=true;
+};
+onkeyup=e=>{
+ keys[e.key]=false;
+};
+
+function hero(){
+ let x=p.x,y=p.y;
+
+ ctx.fillStyle="#3fa9f5";
+ ctx.fillRect(x-12,y-20,24,30);
+
+ ctx.fillStyle="#ffd39b";
+ ctx.beginPath();
+ ctx.arc(x,y-32,10,0,Math.PI*2);
+ ctx.fill();
+
+ ctx.strokeStyle="white";
+ ctx.lineWidth=3;
+ ctx.beginPath();
+ ctx.moveTo(x-18,y-5); ctx.lineTo(x+18,y-5);
+ ctx.moveTo(x-8,y+10); ctx.lineTo(x-12,y+25);
+ ctx.moveTo(x+8,y+10); ctx.lineTo(x+12,y+25);
+ ctx.stroke();
+
+ ctx.strokeStyle="silver";
+ ctx.lineWidth=5;
+ ctx.beginPath();
+ ctx.moveTo(x+18,y-5);
+ ctx.lineTo(x+(attacking?60:40),y-10);
+ ctx.stroke();
+}
+
+function update(){
+ if(keys["ArrowLeft"]) p.x-=5;
+ if(keys["ArrowRight"]) p.x+=5;
+ if(keys["ArrowUp"]) p.y-=5;
+ if(keys["ArrowDown"]) p.y+=5;
+
+ for(let i=enemies.length-1;i>=0;i--){
+   let e=enemies[i];
+
+   let dx=p.x-e.x;
+   let dy=p.y-e.y;
+   let dist=Math.hypot(dx,dy);
+
+   if(dist>0){
+      e.x += dx/dist * e.speed;
+      e.y += dy/dist * e.speed;
+   }
+
+   if(attacking && dist<80){
+      e.hp--;
+      attacking=false;
+
+      if(e.hp<=0){
+         enemies.splice(i,1);
+         p.score+=10;
+      }
+   }
+
+   if(dist<25){
+      p.hp--;
+      e.x+=40;
+
+      if(p.hp<=0){
+        alert("Game Over! Điểm: "+p.score);
+        location.reload();
+      }
+   }
+ }
+
+ attacking=false;
+}
+
+function draw(){
+ ctx.clearRect(0,0,900,500);
+
+ hero();
+
+ enemies.forEach(e=>{
+   ctx.fillStyle="red";
+   ctx.fillRect(e.x-15,e.y-15,30,30);
+
+   ctx.fillStyle="white";
+   ctx.fillText(e.hp,e.x-5,e.y-20);
+ });
+
+ ctx.fillStyle="white";
+ ctx.font="22px Arial";
+ ctx.fillText("HP: "+p.hp,20,30);
+ ctx.fillText("Điểm: "+p.score,20,60);
+ ctx.fillText("Quái còn lại: "+enemies.length,20,90);
+
+ if(enemies.length===0){
+   ctx.font="40px Arial";
+   ctx.fillText("CHIẾN THẮNG!",300,250);
+ }
+}
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Chiến Đấu Đi - Hành Tinh Quái Vật</title>
+
+<style>
+body{
+    margin:0;
+    overflow:hidden;
+    background:#0f172a;
+    color:white;
+    font-family:Arial;
+}
+#ui{
+    position:absolute;
+    top:10px;
+    left:10px;
+    background:rgba(0,0,0,.7);
+    padding:10px;
+    border-radius:10px;
+    z-index:100;
+}
+#shop{
+    position:absolute;
+    top:10px;
+    right:10px;
+    background:rgba(0,0,0,.7);
+    padding:10px;
+    border-radius:10px;
+    z-index:100;
+}
+button{
+    margin-top:5px;
+    width:150px;
+}
+canvas{
+    display:block;
+    background:#18324a;
+}
+</style>
+</head>
+<body>
+
+<div id="ui">
+<h3>⚔ CHIẾN ĐẤU ĐI</h3>
+<div id="stats"></div>
+<p>Di chuyển: WASD</p>
+<p>Tấn công: SPACE</p>
+</div>
+
+<div id="shop">
+<h3>⚡ Võ Điện</h3>
+<button onclick="buySkill(1)">Võ Điện I (100)</button><br>
+<button onclick="buySkill(2)">Võ Điện II (500)</button><br>
+<button onclick="buySkill(3)">Võ Điện III (2000)</button>
+</div>
+
+<canvas id="game"></canvas>
+
+<script>
+const canvas=document.getElementById("game");
+const ctx=canvas.getContext("2d");
+
+canvas.width=window.innerWidth;
+canvas.height=window.innerHeight;
+
+const keys={};
+
+document.addEventListener("keydown",e=>{
+keys[e.key.toLowerCase()]=true;
+
+if(e.code==="Space"){
+attack();
+}
+});
+
+document.addEventListener("keyup",e=>{
+keys[e.key.toLowerCase()]=false;
+});
+
+const player={
+x:400,
+y:300,
+size:40,
+hp:100,
+maxHp:100,
+level:1,
+exp:0,
+gold:0,
+damage:15,
+lightning:0
+};
+
+const monsters=[];
+
+function spawnMonster(){
+monsters.push({
+x:Math.random()*canvas.width,
+y:Math.random()*canvas.height,
+size:35,
+hp:40+player.level*5,
+maxHp:40+player.level*5,
+speed:1+Math.random()*0.8,
+damage:5
+});
+}
+
+for(let i=0;i<8;i++){
+spawnMonster();
+}
+
+function levelUp(){
+while(player.exp>=player.level*100){
+player.exp-=player.level*100;
+player.level++;
+player.maxHp+=20;
+player.hp=player.maxHp;
+player.damage+=5;
+}
+}
+
+function attack(){
+
+for(let m of monsters){
+
+let dx=m.x-player.x;
+let dy=m.y-player.y;
+let dist=Math.sqrt(dx*dx+dy*dy);
+
+if(dist<90){
+
+m.hp-=player.damage;
+
+if(player.lightning>0){
+m.hp-=player.lightning*15;
+}
+
+if(m.hp<=0){
+
+player.gold+=20;
+player.exp+=30;
+
+m.x=Math.random()*canvas.width;
+m.y=Math.random()*canvas.height;
+m.hp=40+player.level*5;
+m.maxHp=m.hp;
+
+levelUp();
+}
+}
+}
+}
+
+function buySkill(level){
+
+if(level===1 && player.gold>=100){
+player.gold-=100;
+player.lightning=1;
+}
+
+if(level===2 && player.gold>=500){
+player.gold-=500;
+player.lightning=2;
+}
+
+if(level===3 && player.gold>=2000){
+player.gold-=2000;
+player.lightning=3;
+}
+}
+
+function update(){
+
+if(keys["w"]) player.y-=4;
+if(keys["s"]) player.y+=4;
+if(keys["a"]) player.x-=4;
+if(keys["d"]) player.x+=4;
+
+player.x=Math.max(20,Math.min(canvas.width-20,player.x));
+player.y=Math.max(20,Math.min(canvas.height-20,player.y));
+
+for(let m of monsters){
+
+let dx=player.x-m.x;
+let dy=player.y-m.y;
+let dist=Math.sqrt(dx*dx+dy*dy);
+
+if(dist>1){
+m.x+=dx/dist*m.speed;
+m.y+=dy/dist*m.speed;
+}
+
+if(dist<30){
+player.hp-=0.1*m.damage;
+}
+
+}
+
+if(player.hp<=0){
+alert("GAME OVER!");
+location.reload();
+}
+}
+
+function drawPlanet(){
+ctx.fillStyle="#2563eb";
+ctx.beginPath();
+ctx.arc(canvas.width/2,canvas.height/2,120,0,Math.PI*2);
+ctx.fill();
+
+ctx.fillStyle="#22c55e";
+ctx.beginPath();
+ctx.arc(canvas.width/2-30,canvas.height/2-20,40,0,Math.PI*2);
+ctx.fill();
+
+ctx.beginPath();
+ctx.arc(canvas.width/2+40,canvas.height/2+30,35,0,Math.PI*2);
+ctx.fill();
+}
+
+function drawPlayer(){
+
+ctx.fillStyle="#f59e0b";
+ctx.fillRect(
+player.x-player.size/2,
+player.y-player.size/2,
+player.size,
+player.size
+);
+
+ctx.fillStyle="#cbd5e1";
+
+ctx.fillRect(
+player.x+10,
+player.y-5,
+30,
+8
+);
+
+if(player.lightning>0){
+
+ctx.strokeStyle="cyan";
+ctx.lineWidth=3;
+
+ctx.beginPath();
+ctx.moveTo(player.x,player.y-25);
+ctx.lineTo(player.x+10,player.y-40);
+ctx.lineTo(player.x-5,player.y-55);
+ctx.stroke();
+}
+}
+
+function drawMonsters(){
+
+for(let m of monsters){
+
+ctx.fillStyle="crimson";
+
+ctx.beginPath();
+ctx.arc(m.x,m.y,m.size/2,0,Math.PI*2);
+ctx.fill();
+
+ctx.fillStyle="red";
+ctx.fillRect(
+m.x-20,
+m.y-30,
+40,
+5
+);
+
+ctx.fillStyle="lime";
+ctx.fillRect(
+m.x-20,
+m.y-30,
+40*(m.hp/m.maxHp),
+5
+);
+}
+}
+
+function draw(){
+
+ctx.clearRect(0,0,canvas.width,canvas.height);
+
+drawPlanet();
+drawMonsters();
+drawPlayer();
+
+document.getElementById("stats").innerHTML=
+`
+❤️ HP: ${Math.floor(player.hp)} / ${player.maxHp}<br>
+⭐ Level: ${player.level}<br>
+⚔ Sức mạnh: ${player.damage}<br>
+💰 Vàng: ${player.gold}<br>
+⚡ Võ Điện: ${player.lightning}
+`;
+}
+
+function gameLoop(){
+
+update();
+draw();
+
+requestAnimationFrame(gameLoop);
+}
+
+gameLoop();
+</script>
+
+</body>
+</html>from pathlib import Path
+
+html = r'''<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<title>Chiến Đấu Đi - Bản Mở Rộng</title>
+<style>
+body{margin:0;overflow:hidden;background:#08121f;color:#fff;font-family:Arial}
+#ui{position:absolute;left:10px;top:10px;background:rgba(0,0,0,.75);padding:10px;border-radius:8px}
+#quests{position:absolute;right:10px;top:10px;background:rgba(0,0,0,.75);padding:10px;border-radius:8px}
+canvas{display:block}
+</style>
+</head>
+<body>
+<div id="ui"><h3>⚔ CHIẾN ĐẤU ĐI</h3><div id="stats"></div></div>
+<div id="quests">
+<h3>Nhiệm vụ</h3>
+<div>Diệt 20 quái để mở Boss</div>
+<div>P: Điện thoại</div>
+<div>1-4: Đổi đảo</div>
+</div>
+<canvas id="game"></canvas>
+<script>
+const cv=document.getElementById("game"),ctx=cv.getContext("2d");
+cv.width=innerWidth;cv.height=innerHeight;
+
+const islands=["Tân Thủ","Quỷ","Đầu Lâu","Rồng"];
+let island=0,kills=0,boss=false;
+
+const p={x:400,y:300,lv:1,exp:0,gold:0,hp:200,maxHp:200,dmg:25,immortal:false,light:false};
+const keys={};
+
+function mkMonster(){
+ return {x:Math.random()*cv.width,y:Math.random()*cv.height,hp:60+p.lv*4,s:1+Math.random()*1.5};
+}
+let mons=[];
+for(let i=0;i<12;i++) mons.push(mkMonster());
+
+addEventListener("keydown",e=>{
+keys[e.key.toLowerCase()]=true;
+if(e.code==="Space") attack();
+if(e.key==="1") island=0;
+if(e.key==="2") island=1;
+if(e.key==="3") island=2;
+if(e.key==="4") island=3;
+
+if(e.key.toLowerCase()==="p"){
+ let pass=prompt("Mật khẩu điện thoại:");
+ if(pass==="0000"){
+   p.immortal=true;
+   p.light=true;
+   p.dmg=500;
+   alert("Đã kích hoạt BẤT TỬ + KIẾM ĐIỆN!");
+ }
+}
+});
+addEventListener("keyup",e=>keys[e.key.toLowerCase()]=false);
+
+function levelUp(){
+ while(p.exp>=p.lv*100){
+   p.exp-=p.lv*100;
+   p.lv++;
+   p.maxHp+=20;
+   p.hp=p.maxHp;
+   p.dmg+=10;
+ }
+}
+
+function attack(){
+ mons.forEach(m=>{
+  if(Math.hypot(m.x-p.x,m.y-p.y)<100){
+    m.hp-=p.dmg;
+    if(m.hp<=0){
+      kills++;
+      p.gold+=20;
+      p.exp+=30;
+      Object.assign(m,mkMonster());
+      levelUp();
+    }
+  }
+ });
+
+ if(kills>=20 && !boss){
+   boss=true;
+   mons.push({x:100,y:100,hp:3000,s:0.8,boss:true});
+ }
+}
+
+function update(){
+ if(keys.w)p.y-=4;
+ if(keys.s)p.y+=4;
+ if(keys.a)p.x-=4;
+ if(keys.d)p.x+=4;
+
+ mons.forEach(m=>{
+  let dx=p.x-m.x,dy=p.y-m.y,d=Math.hypot(dx,dy);
+  m.x+=dx/d*m.s;
+  m.y+=dy/d*m.s;
+  if(d<25 && !p.immortal) p.hp-=m.boss?1:0.2;
+ });
+
+ if(p.hp<=0){alert("Game Over");location.reload();}
+}
+
+function draw(){
+ const colors=["#1e3a8a","#450a0a","#374151","#14532d"];
+ ctx.fillStyle=colors[island];
+ ctx.fillRect(0,0,cv.width,cv.height);
+
+ ctx.fillStyle="gold";
+ ctx.fillRect(p.x-18,p.y-18,36,36);
+
+ ctx.fillStyle="silver";
+ ctx.fillRect(p.x+10,p.y-3,40,6);
+
+ if(p.light){
+  ctx.strokeStyle="cyan";
+  ctx.beginPath();
+  ctx.moveTo(p.x+50,p.y);
+  ctx.lineTo(p.x+70,p.y-15);
+  ctx.lineTo(p.x+85,p.y+10);
+  ctx.stroke();
+ }
+
+ mons.forEach(m=>{
+  ctx.fillStyle=m.boss?"purple":"red";
+  ctx.beginPath();
+  ctx.arc(m.x,m.y,m.boss?28:15,0,7);
+  ctx.fill();
+ });
+
+ document.getElementById("stats").innerHTML=
+ `❤️ ${Math.floor(p.hp)}/${p.maxHp}<br>
+ ⭐ Level ${p.lv}<br>
+ 💰 ${p.gold}<br>
+ ⚔ ${p.dmg}<br>
+ 🏝️ ${islands[island]}<br>
+ 👾 ${kills} quái đã diệt`;
+}
+
+function loop(){update();draw();requestAnimationFrame(loop);}
+loop();
+</script>
+</body>
+</html>'''
+
+path="/mnt/data/chien-dau-di-ban-mo-rong.html"
+Path(path).write_text(html,encoding="utf-8")
+print(path)
+
+function loop(){
+ update();
+ draw();
+ requestAnimationFrame(loop);
+}
+loop();
+</script>
+</body>
+</html>
+"""
+
+path="/mnt/data/Kiem_Si_Quai_Truy_Duoi.html"
+Path(path).write_text(html,encoding="utf-8")
+print(path)x.fillStyle="gold";
+x.fillRect(p.x-20,p.y-20,40,40);
+if(keys.w)p.y-=5;
+if(keys.s)p.y+=5;// Đầu
+ctx.fillStyle="#f5c99b";
+ctx.fillRect(p.x-10,p.y-30,20,20);
+
+// Thân
+ctx.fillStyle="#2563eb";
+ctx.fillRect(p.x-12,p.y-10,24,25);
+
+// Tay
+ctx.fillRect(p.x-20,p.y-10,8,20);
+ctx.fillRect(p.x+12,p.y-10,8,20);
+
+// Chân
+ctx.fillStyle="#222";
+ctx.fillRect(p.x-10,p.y+15,8,20);
+ctx.fillRect(p.x+2,p.y+15,8,20);
+
+// Kiếm
+ctx.fillStyle="silver";
+ctx.fillRect(p.x+20,p.y,30,5);
+if(keys.a)p.x-=5;
+if(keys.d)p.x+=5;
