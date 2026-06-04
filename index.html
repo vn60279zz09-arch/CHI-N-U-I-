@@ -980,4 +980,77 @@ ctx.fillRect(p.x+2,p.y+15,8,20);
 ctx.fillStyle="silver";
 ctx.fillRect(p.x+20,p.y,30,5);
 if(keys.a)p.x-=5;
-if(keys.d)p.x+=5;
+if(keys.d)p.x+=5;// Đầu
+ctx.fillStyle="#f5c99b";
+ctx.fillRect(p.x-10,p.y-30,20,20);
+
+// Thân
+ctx.fillStyle="#2563eb";
+ctx.fillRect(p.x-12,p.y-10,24,25);
+
+// Tay
+ctx.fillRect(p.x-20,p.y-10,8,20);
+ctx.fillRect(p.x+12,p.y-10,8,20);
+
+// Chân
+ctx.fillStyle="#222";
+ctx.fillRect(p.x-10,p.y+15,8,20);
+ctx.fillRect(p.x+2,p.y+15,8,20);
+
+// Kiếm
+ctx.fillStyle="silver";
+ctx.fillRect(p.x+20,p.y,30,5);
+if(keys["j"]) player.x += 5;
+if(keys["k"]) player.x -= 5;
+if(keys["h"]) player.y -= 5;if(keys["j"]) player.x += 5;
+if(keys["k"]) player.x -= 5;
+if(keys["h"]) player.y -= 5;
+if(keys["l"]) player.y += 5;
+if(keys["l"]) player.y += 5;function drawAssassin() {
+
+    // Áo choàng đen
+    ctx.fillStyle = "#111";
+    ctx.fillRect(player.x-12, player.y-10, 24, 30);
+
+    // Đầu
+    ctx.fillStyle = "#f2c29b";
+    ctx.fillRect(player.x-8, player.y-28, 16, 16);
+
+    // Mặt nạ
+    ctx.fillStyle = "#222";
+    ctx.fillRect(player.x-8, player.y-24, 16, 8);
+
+    // Mắt đỏ
+    ctx.fillStyle = "red";
+    ctx.fillRect(player.x-5, player.y-22, 3, 3);
+    ctx.fillRect(player.x+2, player.y-22, 3, 3);
+
+    // Tay trái
+    ctx.fillStyle = "#111";
+    ctx.fillRect(player.x-18, player.y-8, 6, 18);
+
+    // Tay phải
+    ctx.fillRect(player.x+12, player.y-8, 6, 18);
+
+    // Chân trái
+    ctx.fillRect(player.x-8, player.y+20, 6, 16);
+
+    // Chân phải
+    ctx.fillRect(player.x+2, player.y+20, 6, 16);
+
+    // Dao sát thủ
+    ctx.fillStyle = "silver";
+    ctx.fillRect(player.x+18, player.y-2, 20, 4);
+
+    // Kiếm điện khi mở điện thoại 0000
+    if(player.electricSword){
+        ctx.strokeStyle = "cyan";
+        ctx.lineWidth = 3;
+
+        ctx.beginPath();
+        ctx.moveTo(player.x+38, player.y);
+        ctx.lineTo(player.x+48, player.y-10);
+        ctx.lineTo(player.x+58, player.y+8);
+        ctx.stroke();
+    }
+}
